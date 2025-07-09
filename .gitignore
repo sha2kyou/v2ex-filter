@@ -1,0 +1,15 @@
+# Node.js dependencies
+node_modules/
+
+# macOS specific files
+.DS_Store
+
+# Extension packaging files
+*.zip
+*.crx
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
