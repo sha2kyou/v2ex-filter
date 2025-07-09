@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>V2EX Bailian Filter Settings</title>
   <link rel="stylesheet" href="settings.css">
 </head>
 <body>
-  <h1>V2EX Bailian Filter Settings</h1>
+  <h1>V2EX 百炼智能过滤器设置</h1>
 
   <div id="settingsView">
-    <h2 class="section-title">Settings</h2>
+    <h2 class="section-title">基础设置</h2>
     <div class="setting-group">
       <div class="setting">
-        <label for="filterSwitch">Enable Filtering</label>
+        <label for="filterSwitch">启用过滤</label>
         <label class="switch">
           <input type="checkbox" id="filterSwitch">
           <span class="slider"></span>
@@ -19,32 +20,32 @@
       </div>
       <hr style="border: none; border-top: 1px solid var(--border-color); margin: 16px 0;">
       <div class="form-field">
-        <label for="apiKey">Bailian API Key:</label>
+        <label for="apiKey">百炼 API 密钥:</label>
         <input type="password" id="apiKey">
       </div>
     </div>
 
-    <h2 class="section-title">Prompt Settings</h2>
+    <h2 class="section-title">提示词设置</h2>
     <div class="setting-group">
       <div class="form-field">
-        <label for="promptInput">Custom Prompt:</label>
+        <label for="promptInput">自定义提示词:</label>
         <textarea id="promptInput" rows="6"></textarea>
       </div>
 
       <div class="setting-item">
-        <label for="modelSelect">AI Model:</label>
+        <label for="modelSelect">AI 模型:</label>
         <select id="modelSelect">
           <option value="qwen-turbo">qwen-turbo</option>
           <option value="qwen-plus">qwen-plus</option>
-          <option value="other">Other (Specify below)</option>
+          <option value="other">其他 (在下方指定)</option>
         </select>
-        <input type="text" id="customModelInput" placeholder="Enter custom model name" style="display: none;">
+        <input type="text" id="customModelInput" placeholder="输入自定义模型名称" style="display: none;">
       </div>
     </div>
 
     <div class="actions">
-      <button id="save">Save Settings</button>
-      <button id="clearCache" class="secondary">Clear Cache</button>
+      <button id="save">保存设置</button>
+      <button id="clearCache" class="secondary">清除缓存</button>
     </div>
 
     <div id="status"></div>

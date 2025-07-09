@@ -11,16 +11,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 默认提示词
   const defaultPrompt = `
-    You are a content moderator for a forum.
-    Your task is to determine if a post title suggests that the content is useless.
-    Useless content is defined as:
-    1. Purely emotional expressions (e.e.g., rants, complaints).
-    2. Trivial family matters that don't require any specific knowledge and can be commented on by anyone.
+    你是一个论坛的内容审核员。
+    你的任务是判断一个帖子标题是否表明其内容是无用的。
+    无用内容定义为：
+    1. 纯粹的情绪发泄（例如，抱怨、吐槽）。
+    2. 无需任何专业知识、任何人都可以评论的鸡毛蒜皮的家庭琐事。
 
-    Analyze the following title and determine if it falls into the useless category.
-    Respond with only "true" if it is useless, and "false" if it is not.
+    请分析以下标题，判断它是否属于无用类别。
+    如果无用，请只回答 "true"，否则回答 "false"。
 
-    Title: "{title}"
+    标题：“{title}”
   `;
 
   // Load saved settings
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Check for API errors
   chrome.storage.local.get('apiError', function(data) {
     if (data.apiError) {
-      errorDisplay.textContent = `API Error: ${data.apiError}`;
+      errorDisplay.textContent = `API 错误: ${data.apiError}`;
       errorDisplay.style.display = 'block';
       chrome.storage.local.remove('apiError'); // Clear the error after displaying
     }
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
       selectedModel = customModelInput.value; // Use custom input if 'other' is selected
     }
     chrome.storage.sync.set({apiKey: apiKey, customPrompt: customPrompt, selectedModel: selectedModel}, function() {
-      status.textContent = 'Settings saved.';
+      status.textContent = '设置已保存。';
       setTimeout(function() {
         status.textContent = '';
       }, 2000);
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
   clearCacheButton.addEventListener('click', function() {
     chrome.runtime.sendMessage({action: "clearCache"}, function(response) {
       if (response.success) {
-        status.textContent = 'Cache cleared.';
+        status.textContent = '缓存已清除。';
         setTimeout(function() {
           status.textContent = '';
         }, 2000);

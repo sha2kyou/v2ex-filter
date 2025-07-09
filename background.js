@@ -2,7 +2,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "clearCache") {
     console.log("Background: Received clearCache request.");
     chrome.storage.local.get(null, (items) => {
-      const keysToRemove = Object.keys(items).filter(key => key.startsWith('v2ex-filter-cache-') || key === 'hiddenTitles');
+      const keysToRemove = Object.keys(items).filter(key => key.startsWith('v2ex-filter-cache:') || key === 'hiddenTitles');
       console.log("Background: Keys to remove: ", keysToRemove);
       if (keysToRemove.length > 0) {
         chrome.storage.local.remove(keysToRemove, () => {
@@ -11,11 +11,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             sendResponse({success: false, error: chrome.runtime.lastError.message});
           } else {
             console.log("Background: Cache keys successfully removed.");
+            chrome.action.setBadgeText({text: ''}); // Clear badge
             sendResponse({success: true});
           }
         });
       } else {
         console.log("Background: No cache keys found to remove.");
+        chrome.action.setBadgeText({text: ''}); // Clear badge
         sendResponse({success: true});
       }
     });
@@ -29,20 +31,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return;
       }
 
-      const today = new Date().toISOString().slice(0, 10);
-      const cacheKeyPrefix = `v2ex-filter-cache-${today}`;
+      const CACHE_DURATION_MS = 15 * 24 * 60 * 60 * 1000; // 15 days
+      const cacheKeyPrefix = 'v2ex-filter-cache:';
+      const now = Date.now();
 
       const results = [];
-      const cachedData = await chrome.storage.local.get(null);
+      // Get all keys we might need
+      const keysToGet = request.topics.map(title => `${cacheKeyPrefix}${title}`);
+      const cachedData = await chrome.storage.local.get(keysToGet);
 
       for (const title of request.topics) {
-        const cacheKey = `${cacheKeyPrefix}:${title}`;
-        if (cachedData[cacheKey] !== undefined) {
-          results.push({ is_useless: cachedData[cacheKey] });
+        const cacheKey = `${cacheKeyPrefix}${title}`;
+        const cachedItem = cachedData[cacheKey];
+
+        if (cachedItem && (now - cachedItem.timestamp < CACHE_DURATION_MS)) {
+          // Cache hit and not expired
+          results.push({ is_useless: cachedItem.result });
         } else {
+          // Cache miss or expired
           const is_useless = await isUseless(title, settings.apiKey, settings.selectedModel);
           results.push({ is_useless });
-          chrome.storage.local.set({ [cacheKey]: is_useless });
+          // Set new cache item with timestamp
+          chrome.storage.local.set({ [cacheKey]: { result: is_useless, timestamp: now } });
         }
       }
       sendResponse({ results });
@@ -58,16 +68,16 @@ async function isUseless(title, apiKey, selectedModel) {
   const API_URL = `https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions`;
 
   const defaultPrompt = `
-    You are a content moderator for a forum.
-    Your task is to determine if a post title suggests that the content is useless.
-    Useless content is defined as:
-    1. Purely emotional expressions (e.g., rants, complaints).
-    2. Trivial family matters that don't require any specific knowledge and can be commented on by anyone.
+    你是一个论坛的内容审核员。
+    你的任务是判断一个帖子标题是否表明其内容是无用的。
+    无用内容定义为：
+    1. 纯粹的情绪发泄（例如，抱怨、吐槽）。
+    2. 无需任何专业知识、任何人都可以评论的鸡毛蒜皮的家庭琐事。
 
-    Analyze the following title and determine if it falls into the useless category.
-    Respond with only "true" if it is useless, and "false" if it is not.
+    请分析以下标题，判断它是否属于无用类别。
+    如果无用，请只回答 "true"，否则回答 "false"。
 
-    Title: "{title}"
+    标题：“{title}”
   `;
 
   const settings = await chrome.storage.sync.get('customPrompt');

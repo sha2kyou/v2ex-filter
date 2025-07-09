@@ -152,6 +152,7 @@ button.secondary:hover {
 
 #hiddenTopicsContainer {
   max-height: 300px;
+  min-height: 100px;
   overflow-y: auto;
 }
 
