@@ -23,7 +23,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   if (request.topics) {
-    chrome.storage.sync.get(['apiKey', 'filterEnabled'], async (settings) => {
+    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'selectedModel'], async (settings) => {
       if (!settings.apiKey || settings.filterEnabled === false) {
         sendResponse({results: request.topics.map(() => ({ is_useless: false }))});
         return;
@@ -40,7 +40,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (cachedData[cacheKey] !== undefined) {
           results.push({ is_useless: cachedData[cacheKey] });
         } else {
-          const is_useless = await isUseless(title, settings.apiKey);
+          const is_useless = await isUseless(title, settings.apiKey, settings.selectedModel);
           results.push({ is_useless });
           chrome.storage.local.set({ [cacheKey]: is_useless });
         }
@@ -54,7 +54,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return true; // Indicates that the response is sent asynchronously
 });
 
-async function isUseless(title, apiKey) {
+async function isUseless(title, apiKey, selectedModel) {
   const API_URL = `https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions`;
 
   const defaultPrompt = `
@@ -82,7 +82,7 @@ async function isUseless(title, apiKey) {
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        "model": "qwen-turbo",
+        "model": selectedModel || "qwen-turbo", // Use selectedModel, default to qwen-turbo
         "messages": [
           {
             "role": "user",

@@ -15,7 +15,7 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   width: 320px;
-  min-height: 460px; /* Reverted to previous minimum height */
+  min-height: 400px; /* Reverted to previous minimum height */
   padding: 16px;
   background-color: var(--background-color);
   color: var(--text-color);
@@ -219,4 +219,38 @@ input:focus + .slider {
 
 input:checked + .slider:before {
   transform: translateX(20px);
+}
+
+select {
+  width: 100%;
+  padding: 10px 30px 10px 10px; /* Add right padding for the arrow */
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-sizing: border-box;
+  background-color: #fdfdff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: menulist-button; /* Use native dropdown arrow */
+  -moz-appearance: menulist-button;
+  appearance: menulist-button;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-sizing: border-box;
+  background-color: #fdfdff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+select:focus,
+input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+}
+
+.setting-item {
+  margin-bottom: 16px; /* Add some spacing below the model select */
 }

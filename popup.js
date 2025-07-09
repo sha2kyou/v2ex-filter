@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const status = document.getElementById('status');
   const errorDisplay = document.getElementById('errorDisplay');
   const promptInput = document.getElementById('promptInput');
+  const modelSelect = document.getElementById('modelSelect');
+  const customModelInput = document.getElementById('customModelInput');
 
   const hiddenTopicsView = document.getElementById('hiddenTopicsView');
   const settingsView = document.getElementById('settingsView');
@@ -28,12 +30,24 @@ document.addEventListener('DOMContentLoaded', function() {
   `;
 
   // Load saved settings
-  chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt'], function(data) {
+  chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel'], function(data) {
     if (data.apiKey) {
       apiKeyInput.value = data.apiKey;
     }
     filterSwitch.checked = data.filterEnabled !== false; // Default to true
     promptInput.value = data.customPrompt || defaultPrompt;
+
+    if (data.selectedModel && (data.selectedModel === 'qwen-turbo' || data.selectedModel === 'qwen-plus')) {
+      modelSelect.value = data.selectedModel;
+      customModelInput.style.display = 'none';
+    } else if (data.selectedModel) {
+      modelSelect.value = 'other';
+      customModelInput.value = data.selectedModel;
+      customModelInput.style.display = 'block';
+    } else {
+      modelSelect.value = 'qwen-turbo'; // Default
+      customModelInput.style.display = 'none';
+    }
   });
 
   // Check for API errors
@@ -48,6 +62,15 @@ document.addEventListener('DOMContentLoaded', function() {
   // Save filter switch state
   filterSwitch.addEventListener('change', function() {
     chrome.storage.sync.set({filterEnabled: filterSwitch.checked});
+  });
+
+  // Show/hide custom model input based on selection
+  modelSelect.addEventListener('change', function() {
+    if (modelSelect.value === 'other') {
+      customModelInput.style.display = 'block';
+    } else {
+      customModelInput.style.display = 'none';
+    }
   });
 
   // Load and display hidden topics
@@ -65,7 +88,11 @@ document.addEventListener('DOMContentLoaded', function() {
   saveButton.addEventListener('click', function() {
     const apiKey = apiKeyInput.value;
     const customPrompt = promptInput.value;
-    chrome.storage.sync.set({apiKey: apiKey, customPrompt: customPrompt}, function() {
+    let selectedModel = modelSelect.value;
+    if (selectedModel === 'other') {
+      selectedModel = customModelInput.value; // Use custom input if 'other' is selected
+    }
+    chrome.storage.sync.set({apiKey: apiKey, customPrompt: customPrompt, selectedModel: selectedModel}, function() {
       status.textContent = 'Settings saved.';
       setTimeout(function() {
         status.textContent = '';
@@ -94,5 +121,12 @@ document.addEventListener('DOMContentLoaded', function() {
   backButton.addEventListener('click', function() {
     settingsView.style.display = 'none';
     hiddenTopicsView.style.display = 'block';
+  });
+
+  // Listen for changes in selectedModel and reload tab
+  chrome.storage.onChanged.addListener(function(changes, namespace) {
+    if (namespace === 'sync' && changes.selectedModel) {
+      reloadActiveTab();
+    }
   });
 });
