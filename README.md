@@ -1,62 +1,37 @@
-# V2EX Topic Filter
+# V2EX 话题过滤器
 
-A browser extension that filters V2EX topics based on user-defined criteria using an AI model (specifically, Bailian AI). This extension helps you hide "useless" or irrelevant topics from your V2EX feed, allowing for a cleaner browsing experience.
+这是一个浏览器扩展，使用 AI（百炼 AI）根据用户定义的标准过滤 V2EX 话题。它可以帮助您从 V2EX 动态中隐藏“无用”或不相关的话题，提供更清爽的浏览体验。
 
-## Features
+## 主要功能
 
-*   **AI-Powered Filtering:** Utilizes Bailian AI to analyze topic titles and determine their relevance.
-*   **Customizable Criteria:** Define what constitutes "useless" content by customizing the AI prompt. The default criteria include:
-    *   Purely emotional expressions (e.g., rants, complaints).
-    *   Trivial family matters that don't require specific knowledge.
-*   **Toggle Filtering:** Easily enable or disable topic filtering from the extension's popup.
-*   **API Key Management:** Securely store and manage your Bailian AI API key within the extension.
-*   **Hidden Topics List:** View a list of topics that have been hidden by the filter.
-*   **Cache Clearing:** Clear the extension's cache for fresh filtering results.
+*   **AI 过滤：** 利用百炼 AI 分析话题标题并判断其相关性。
+*   **自定义标准：** 可自定义 AI 提示词，定义“无用”内容的标准。
+*   **开关过滤：** 轻松启用或禁用话题过滤。
+*   **API 密钥管理：** 安全存储和管理您的百炼 AI API 密钥。
 
-## Installation
+## 安装
 
-To install this extension, follow these steps:
+1.  **下载：** 克隆或下载此仓库到您的本地。
+2.  **打开扩展管理页面：**
+    *   **Chrome/Brave/Edge：** 访问 `chrome://extensions`。
+    *   **Firefox：** 访问 `about:addons`，然后点击齿轮图标选择“调试附加组件”。
+3.  **加载已解压的扩展程序：**
+    *   启用“开发者模式”。
+    *   点击“加载已解压的扩展程序”，选择您下载的仓库目录。
+4.  **配置：** 点击扩展图标，在设置中输入您的百炼 AI API 密钥并启用过滤。
 
-1.  **Download:** Clone or download this repository to your local machine.
-2.  **Open Extension Management:**
-    *   **Chrome/Brave/Edge:** Go to `chrome://extensions` (or `brave://extensions`, `edge://extensions`).
-    *   **Firefox:** Go to `about:addons`, then click on the gear icon and select "Debug Add-ons".
-3.  **Load Unpacked:**
-    *   Enable "Developer mode" (usually a toggle in the top right corner).
-    *   Click on "Load unpacked" (or "Load Temporary Add-on" for Firefox).
-    *   Select the directory where you downloaded/cloned this repository.
-4.  **Configure:**
-    *   Click on the extension icon in your browser toolbar.
-    *   Enter your Bailian AI API key in the settings.
-    *   (Optional) Customize the AI prompt to refine filtering criteria.
-    *   Ensure the filter is enabled.
+## 使用
 
-## Usage
+安装并配置后，访问 [V2EX](https://www.v2ex.com/)，扩展程序将自动根据您的设置过滤话题。
 
-Once installed and configured:
+## 致谢
 
-1.  Navigate to [V2EX](https://www.v2ex.com/).
-2.  The extension will automatically filter topics based on your settings.
-3.  Click the extension icon to:
-    *   Toggle filtering on/off.
-    *   Access settings (API key, custom prompt).
-    *   View hidden topics.
-    *   Clear the cache.
+本项目从 [V2EX 帖子：V2EX 话题过滤器](https://v2ex.com/t/1143652) 获取灵感并基于其内容进行开发，在此向原作者表示感谢。
 
-## Project Structure
+## 贡献
 
-*   `manifest.json`: The manifest file for the browser extension, defining its properties and permissions.
-*   `background.js`: Handles background tasks, including communication with the AI service and managing cached results.
-*   `content.js`: Injects into V2EX pages to hide/show topics based on filtering results.
-*   `popup.html`: The HTML structure for the extension's popup interface.
-*   `popup.css`: Styles for the popup interface.
-*   `popup.js`: Handles the logic and interactivity of the popup interface, including settings management.
-*   `images/`: Contains icons used by the extension.
+欢迎贡献！请随时提交问题或拉取请求。
 
-## Contributing
+## 许可证
 
-Contributions are welcome! Please feel free to open issues or submit pull requests.
-
-## License
-
-[Specify your license here, e.g., MIT, Apache 2.0, etc.]
+MIT LICENSE
