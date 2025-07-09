@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>V2EX Bailian Filter Settings</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <h1>V2EX Bailian Filter Settings</h1>
+
+  <div id="settingsView">
+    <h2 class="section-title">Settings</h2>
+    <div class="setting-group">
+      <div class="setting">
+        <label for="filterSwitch">Enable Filtering</label>
+        <label class="switch">
+          <input type="checkbox" id="filterSwitch">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <hr style="border: none; border-top: 1px solid var(--border-color); margin: 16px 0;">
+      <div class="form-field">
+        <label for="apiKey">Bailian API Key:</label>
+        <input type="password" id="apiKey">
+      </div>
+    </div>
+
+    <h2 class="section-title">Prompt Settings</h2>
+    <div class="setting-group">
+      <div class="form-field">
+        <label for="promptInput">Custom Prompt:</label>
+        <textarea id="promptInput" rows="6"></textarea>
+      </div>
+
+      <div class="setting-item">
+        <label for="modelSelect">AI Model:</label>
+        <select id="modelSelect">
+          <option value="qwen-turbo">qwen-turbo</option>
+          <option value="qwen-plus">qwen-plus</option>
+          <option value="other">Other (Specify below)</option>
+        </select>
+        <input type="text" id="customModelInput" placeholder="Enter custom model name" style="display: none;">
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="save">Save Settings</button>
+      <button id="clearCache" class="secondary">Clear Cache</button>
+    </div>
+
+    <div id="status"></div>
+    <div id="errorDisplay" style="display: none;"></div>
+
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>
