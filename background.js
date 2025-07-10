@@ -137,22 +137,22 @@ async function isUseless(title, apiKey, selectedModel) {
 function setErrorState(errorMessage) {
   if (errorMessage) {
     chrome.storage.local.set({apiError: errorMessage});
-    chrome.action.setIcon({
-      path: {
-        "16": "images/iconbackup/icon16.png",
-        "48": "images/iconbackup/icon48.png",
-        "128": "images/iconbackup/icon128.png"
-      }
-    });
+    // chrome.action.setIcon({
+    //   path: {
+    //     "16": "images/iconbackup/icon16.png",
+    //     "48": "images/iconbackup/icon48.png",
+    //     "128": "images/iconbackup/icon128.png"
+    //   }
+    // });
   } else {
     chrome.storage.local.remove('apiError');
-    chrome.action.setIcon({
-      path: {
-        "16": "images/icon16.png",
-        "48": "images/icon48.png",
-        "128": "images/icon128.png"
-      }
-    });
+    // chrome.action.setIcon({
+    //   path: {
+    //     "16": "images/icon16.png",
+    //     "48": "images/icon48.png",
+    //     "128": "images/icon128.png"
+    //   }
+    // });
   }
 }
 
