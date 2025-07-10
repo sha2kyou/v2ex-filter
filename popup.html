@@ -2,11 +2,11 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>V2EX Bailian Filter</title>
+  <title>V2EX Filter</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <h1>V2EX 百炼过滤器</h1>
+  <h1>V2EX 过滤器</h1>
 
   <div id="hiddenTopicsView">
     <h2 class="section-title">已隐藏话题</h2>
@@ -16,8 +16,13 @@
         </div>
     </div>
     <div class="actions">
-      <button id="openSettingsButton">设置</button>
-      <button id="clearCache" class="secondary">清除缓存</button>
+      <div class="button-row">
+        <button id="toggleFilterButton" class="secondary">显示全部</button>
+      </div>
+      <div class="button-row">
+        <button id="openSettingsButton">设置</button>
+        <button id="clearCache" class="secondary">清除缓存</button>
+      </div>
     </div>
     <div id="status"></div>
   </div>

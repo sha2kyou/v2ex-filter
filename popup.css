@@ -140,8 +140,18 @@ textarea {
 
 .actions {
   display: flex;
+  flex-direction: column;
   gap: 10px;
   margin-top: 10px;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+}
+
+.button-row button {
+  flex-grow: 1;
 }
 
 button {

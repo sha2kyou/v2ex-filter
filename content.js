@@ -1,8 +1,12 @@
 chrome.runtime.sendMessage({action: "clearBadge"});
 
+let allTopicElements = []; // Store all topic elements
+let currentHiddenTitles = []; // Store currently hidden titles
+
 chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(data) {
   const topicElements = document.querySelectorAll('div.cell.item');
-  const totalTopics = topicElements.length;
+  allTopicElements = Array.from(topicElements); // Convert NodeList to Array
+  const totalTopics = allTopicElements.length;
   let processedTopics = 0;
   let filterStartTime = 0; // 新增：记录过滤开始时间
 
@@ -77,7 +81,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
 
   if (data.filterEnabled === false) {
     // If filtering is disabled, show all topics and clear badge
-    topicElements.forEach(element => {
+    allTopicElements.forEach(element => {
       element.style.display = 'block';
     });
     chrome.runtime.sendMessage({hiddenTitles: []}); // Clear hidden titles and badge
@@ -88,12 +92,12 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
     progressBarContainer.style.display = 'block';
 
     // First, hide all topics to ensure consistent behavior
-    topicElements.forEach(element => {
+    allTopicElements.forEach(element => {
       element.style.display = 'none';
     });
 
     // If filtering is enabled, proceed with the filtering logic
-    const topics = Array.from(topicElements).map(element => {
+    const topics = allTopicElements.map(element => {
       const link = element.querySelector('.item_title > a');
       return {
         title: link ? link.innerText : '',
@@ -116,6 +120,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
             topics[index].element.style.display = 'block';
           }
         });
+        currentHiddenTitles = hiddenTitles; // Store hidden titles
         chrome.runtime.sendMessage({hiddenTitles: hiddenTitles});
         // Hide progress bar after a short delay to show completion
         setTimeout(() => {
@@ -153,6 +158,20 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
           progressBarContainer.style.display = 'none';
         }, 500);
       }
+    } else if (request.action === "showAllTopics") {
+      allTopicElements.forEach(element => {
+        element.style.display = 'block';
+      });
+    } else if (request.action === "showFilteredTopics") {
+      allTopicElements.forEach(element => {
+        const link = element.querySelector('.item_title > a');
+        const title = link ? link.innerText : '';
+        if (currentHiddenTitles.includes(title)) {
+          element.style.display = 'none';
+        } else {
+          element.style.display = 'block';
+        }
+      });
     }
   });
 });

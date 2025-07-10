@@ -132,7 +132,7 @@ textarea:focus {
 
 textarea {
   resize: vertical;
-  min-height: 300px;
+  min-height: 150px;
 }
 
 .actions {

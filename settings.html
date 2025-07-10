@@ -2,14 +2,14 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>V2EX Bailian Filter Settings</title>
+  <title>V2EX Filter Settings</title>
   <link rel="stylesheet" href="settings.css">
 </head>
 <body>
-  <h1>V2EX 百炼智能过滤器设置</h1>
+  <h1>V2EX 智能过滤器设置</h1>
 
   <div id="settingsView">
-    <h2 class="section-title">基础设置</h2>
+    <h2 class="section-title">通用设置</h2>
     <div class="setting-group">
       <div class="setting">
         <label for="filterSwitch">启用过滤</label>
@@ -26,20 +26,15 @@
           <span class="slider"></span>
         </label>
       </div>
-      <hr style="border: none; border-top: 1px solid var(--border-color); margin: 16px 0;">
+    </div>
+
+    <h2 class="section-title">AI 过滤设置</h2>
+    <div class="setting-group">
       <div class="form-field">
         <label for="apiKey">百炼 API 密钥:</label>
         <input type="password" id="apiKey">
       </div>
-    </div>
-
-    <h2 class="section-title">提示词设置</h2>
-    <div class="setting-group">
-      <div class="form-field">
-        <label for="promptInput">自定义提示词:</label>
-        <textarea id="promptInput" rows="6"></textarea>
-      </div>
-
+      <hr style="border: none; border-top: 1px solid var(--border-color); margin: 16px 0;">
       <div class="setting-item">
         <label for="modelSelect">AI 模型:</label>
         <select id="modelSelect">
@@ -48,6 +43,11 @@
           <option value="other">其他 (在下方指定)</option>
         </select>
         <input type="text" id="customModelInput" placeholder="输入自定义模型名称" style="display: none;">
+      </div>
+      <hr style="border: none; border-top: 1px solid var(--border-color); margin: 16px 0;">
+      <div class="form-field">
+        <label for="promptInput">自定义提示词:</label>
+        <textarea id="promptInput" rows="3"></textarea>
       </div>
     </div>
 
