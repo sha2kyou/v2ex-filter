@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   const apiKeyInput = document.getElementById('apiKey');
   const saveButton = document.getElementById('save');
-  const clearCacheButton = document.getElementById('clearCache');
   const filterSwitch = document.getElementById('filterSwitch');
   const status = document.getElementById('status');
   const errorDisplay = document.getElementById('errorDisplay');
@@ -83,18 +82,6 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(function() {
         status.textContent = '';
       }, 2000);
-    });
-  });
-
-  // Clear cache
-  clearCacheButton.addEventListener('click', function() {
-    chrome.runtime.sendMessage({action: "clearCache"}, function(response) {
-      if (response.success) {
-        status.textContent = '缓存已清除。';
-        setTimeout(function() {
-          status.textContent = '';
-        }, 2000);
-      }
     });
   });
 
