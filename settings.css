@@ -10,7 +10,7 @@
   --border-color: #e5e5e7;
   --danger-color: #ff3b30;
   --danger-background: #ffebeb;
-  --input-background-color: #fdfdff;
+  --input-background-color: #fdfdff; /* New variable for input background */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -26,13 +26,14 @@
     --border-color: #38383a;
     --danger-color: #ff453a;
     --danger-background: #632626;
-    --input-background-color: #3a3a3c;
+    --input-background-color: #3a3a3c; /* Dark mode input background */
   }
 
   input[type="password"],
   textarea,
   input[type="text"],
   select {
+    /* background-color will now be controlled by --input-background-color */
     color: var(--text-color);
     border-color: var(--border-color);
   }
@@ -51,6 +52,9 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  max-width: 600px; /* Add a max-width for larger screens */
+  margin: 0 auto; /* Center the content */
+  min-height: 400px; 
   padding: 16px;
   background-color: var(--background-color);
   color: var(--text-color);
@@ -75,7 +79,7 @@ h1 {
   background-color: var(--card-background);
   border-radius: 10px;
   padding: 16px;
-  margin-top: 0;
+  margin-top: 0; 
   margin-bottom: 16px;
   border: 1px solid var(--border-color);
 }
@@ -109,22 +113,18 @@ div.form-field > label {
 }
 
 input[type="password"],
-textarea,
-input[type="text"],
-select {
+textarea {
   width: 100%;
   padding: 10px;
   border: 1px solid var(--border-color);
   border-radius: 6px;
   box-sizing: border-box;
-  background-color: var(--input-background-color);
+  background-color: var(--input-background-color); /* Use variable */
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 input[type="password"]:focus,
-textarea:focus,
-input[type="text"]:focus,
-select:focus {
+textarea:focus {
   outline: none;
   border-color: var(--primary-accent);
   box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
@@ -132,6 +132,7 @@ select:focus {
 
 textarea {
   resize: vertical;
+  min-height: 150px;
 }
 
 .actions {
@@ -188,6 +189,27 @@ button.secondary:hover {
   color: var(--danger-color);
 }
 
+#hiddenTopicsContainer {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+ul#hiddenTopics {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+ul#hiddenTopics li {
+  padding: 8px;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+ul#hiddenTopics li:last-child {
+  border-bottom: none;
+}
+
 /* Toggle Switch CSS */
 .switch {
   position: relative;
@@ -238,6 +260,36 @@ input:checked + .slider:before {
   transform: translateX(20px);
 }
 
+select {
+  width: 100%;
+  padding: 10px 30px 10px 10px; /* Add right padding for the arrow */
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-sizing: border-box;
+  background-color: var(--input-background-color); /* Use variable */
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: menulist-button; /* Use native dropdown arrow */
+  -moz-appearance: menulist-button;
+  appearance: menulist-button;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-sizing: border-box;
+  background-color: var(--input-background-color); /* Use variable */
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+select:focus,
+input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+}
+
 .setting-item {
-  margin-bottom: 16px;
+  margin-bottom: 16px; /* Add some spacing below the model select */
 }
