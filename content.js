@@ -3,6 +3,11 @@ chrome.storage.sync.get('filterEnabled', function(data) {
   const totalTopics = topicElements.length;
   let processedTopics = 0;
 
+  // Detect page theme colors
+  const computedStyle = getComputedStyle(document.body);
+  const pageBackgroundColor = computedStyle.backgroundColor;
+  const pageTextColor = computedStyle.color;
+
   // Create and append progress bar
   const progressBarContainer = document.createElement('div');
   progressBarContainer.id = 'v2ex-filter-progress-container';
@@ -11,19 +16,40 @@ chrome.storage.sync.get('filterEnabled', function(data) {
     top: 0;
     left: 0;
     width: 100%;
-    height: 5px;
-    background-color: #f0f0f0;
+    height: 20px; /* Increased height for text */
+    background-color: ${pageBackgroundColor};
     z-index: 9999;
     display: none; /* Hidden by default */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   `;
+
   const progressBar = document.createElement('div');
   progressBar.id = 'v2ex-filter-progress-bar';
   progressBar.style.cssText = `
     width: 0%;
     height: 100%;
-    background-color: #4CAF50;
+    background-color: #4CAF50; /* Keep a distinct progress color */
+    transition: width 0.1s linear; /* Smooth transition */
   `;
+
+  const progressText = document.createElement('div');
+  progressText.id = 'v2ex-filter-progress-text';
+  progressText.style.cssText = `
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: ${pageTextColor};
+    text-align: center;
+    line-height: 20px; /* Match container height */
+    font-size: 12px;
+    font-weight: bold;
+    text-shadow: 0 0 2px ${pageBackgroundColor};
+  `;
+
   progressBarContainer.appendChild(progressBar);
+  progressBarContainer.appendChild(progressText);
   document.body.appendChild(progressBarContainer);
 
   if (data.filterEnabled === false) {
@@ -34,7 +60,8 @@ chrome.storage.sync.get('filterEnabled', function(data) {
     chrome.runtime.sendMessage({hiddenTitles: []}); // Clear hidden titles and badge
     progressBarContainer.style.display = 'none'; // Ensure progress bar is hidden
   } else {
-    // Show progress bar
+    // Show progress bar and set initial text
+    progressText.textContent = `AI 过滤准备中... (0 / ${totalTopics})`;
     progressBarContainer.style.display = 'block';
 
     // First, hide all topics to ensure consistent behavior
@@ -64,7 +91,10 @@ chrome.storage.sync.get('filterEnabled', function(data) {
           }
         });
         chrome.runtime.sendMessage({hiddenTitles: hiddenTitles});
-        progressBarContainer.style.display = 'none'; // Hide progress bar after completion
+        // Hide progress bar after a short delay to show completion
+        setTimeout(() => {
+          progressBarContainer.style.display = 'none';
+        }, 500);
       }
     });
   }
@@ -75,8 +105,13 @@ chrome.storage.sync.get('filterEnabled', function(data) {
       processedTopics = request.processedCount;
       const progress = (processedTopics / totalTopics) * 100;
       progressBar.style.width = `${progress}%`;
+      progressText.textContent = `AI 过滤中: ${processedTopics} / ${totalTopics}`;
+
       if (processedTopics === totalTopics) {
-        progressBarContainer.style.display = 'none'; // Hide when 100%
+        // Hide progress bar after a short delay to show completion
+        setTimeout(() => {
+          progressBarContainer.style.display = 'none';
+        }, 500);
       }
     }
   });
