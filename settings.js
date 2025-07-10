@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const promptInput = document.getElementById('promptInput');
   const modelSelect = document.getElementById('modelSelect');
   const customModelInput = document.getElementById('customModelInput');
+  const animatedGradientSwitch = document.getElementById('animatedGradientSwitch'); // 新增
 
   // 默认提示词
   const defaultPrompt = `
@@ -24,12 +25,13 @@ document.addEventListener('DOMContentLoaded', function() {
   `;
 
   // Load saved settings
-  chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel'], function(data) {
+  chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled'], function(data) {
     if (data.apiKey) {
       apiKeyInput.value = data.apiKey;
     }
     filterSwitch.checked = data.filterEnabled !== false; // Default to true
     promptInput.value = data.customPrompt || defaultPrompt;
+    animatedGradientSwitch.checked = data.animatedGradientEnabled !== false; // Default to true
 
     if (data.selectedModel && (data.selectedModel === 'qwen-turbo' || data.selectedModel === 'qwen-plus')) {
       modelSelect.value = data.selectedModel;
@@ -72,10 +74,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const apiKey = apiKeyInput.value;
     const customPrompt = promptInput.value;
     let selectedModel = modelSelect.value;
+    const animatedGradientEnabled = animatedGradientSwitch.checked; // 新增
     if (selectedModel === 'other') {
       selectedModel = customModelInput.value; // Use custom input if 'other' is selected
     }
-    chrome.storage.sync.set({apiKey: apiKey, customPrompt: customPrompt, selectedModel: selectedModel}, function() {
+    chrome.storage.sync.set({apiKey: apiKey, customPrompt: customPrompt, selectedModel: selectedModel, animatedGradientEnabled: animatedGradientEnabled}, function() {
       status.textContent = '设置已保存。';
       setTimeout(function() {
         status.textContent = '';

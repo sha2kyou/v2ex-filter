@@ -1,7 +1,10 @@
-chrome.storage.sync.get('filterEnabled', function(data) {
+chrome.runtime.sendMessage({action: "clearBadge"});
+
+chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(data) {
   const topicElements = document.querySelectorAll('div.cell.item');
   const totalTopics = topicElements.length;
   let processedTopics = 0;
+  let filterStartTime = 0; // 新增：记录过滤开始时间
 
   // Detect page theme colors
   const computedStyle = getComputedStyle(document.body);
@@ -28,9 +31,29 @@ chrome.storage.sync.get('filterEnabled', function(data) {
   progressBar.style.cssText = `
     width: 0%;
     height: 100%;
-    background-color: #4CAF50; /* Keep a distinct progress color */
     transition: width 0.1s linear; /* Smooth transition */
   `;
+
+  // Check if animated gradient is enabled
+  if (data.animatedGradientEnabled !== false) { // Default to true
+    // Inject animated gradient CSS
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes gradientAnimation {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 100% 50%; }
+      }
+      .animated-gradient {
+        background: linear-gradient(90deg, #00c6ff, #0072ff, #92fe9d, #00c6ff);
+      background-size: 400% 100%; /* Increased size for smoother animation */
+      animation: gradientAnimation 30s linear infinite; /* Longer duration for smoother loop */
+      }
+    `;
+    document.head.appendChild(style);
+    progressBar.classList.add('animated-gradient'); // Add the class for animated gradient
+  } else {
+    progressBar.style.backgroundColor = '#4CAF50'; // Green background
+  }
 
   const progressText = document.createElement('div');
   progressText.id = 'v2ex-filter-progress-text';
@@ -78,6 +101,9 @@ chrome.storage.sync.get('filterEnabled', function(data) {
       };
     });
 
+    // 在发送消息前记录开始时间
+    filterStartTime = Date.now();
+
     chrome.runtime.sendMessage({topics: topics.map(t => t.title)}, function(response) {
       if (response && response.results) {
         const hiddenTitles = [];
@@ -105,7 +131,21 @@ chrome.storage.sync.get('filterEnabled', function(data) {
       processedTopics = request.processedCount;
       const progress = (processedTopics / totalTopics) * 100;
       progressBar.style.width = `${progress}%`;
-      progressText.textContent = `AI 过滤中: ${processedTopics} / ${totalTopics}`;
+
+      let statusText = `AI 过滤中: ${processedTopics} / ${totalTopics} (${progress.toFixed(0)}%)`;
+
+      // 计算并显示剩余时间
+      if (processedTopics > 0 && filterStartTime > 0) {
+        const elapsedTime = (Date.now() - filterStartTime) / 1000; // 已花费时间（秒）
+        const avgTimePerTopic = elapsedTime / processedTopics; // 平均每个话题的处理时间
+        const estimatedRemainingTime = avgTimePerTopic * (totalTopics - processedTopics); // 估算剩余时间
+
+        statusText += ` - 预计剩余 ${Math.max(0, estimatedRemainingTime).toFixed(0)} 秒`; // 确保不显示负数
+      } else {
+        statusText += ` - 正在估算剩余时间...`;
+      }
+
+      progressText.textContent = statusText;
 
       if (processedTopics === totalTopics) {
         // Hide progress bar after a short delay to show completion

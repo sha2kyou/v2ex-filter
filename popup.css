@@ -10,6 +10,48 @@
   --border-color: #e5e5e7;
   --danger-color: #ff3b30;
   --danger-background: #ffebeb;
+  --input-background-color: #fdfdff; /* New variable for input background */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #1c1c1e;
+    --card-background: #2c2c2e;
+    --text-color: #f2f2f7;
+    --label-color: #8e8e93;
+    --primary-accent: #0a84ff;
+    --primary-accent-hover: #32aaff;
+    --secondary-background: #3a3a3c;
+    --secondary-background-hover: #48484a;
+    --border-color: #38383a;
+    --danger-color: #ff453a;
+    --danger-background: #632626;
+    --input-background-color: #3a3a3c; /* Dark mode input background */
+  }
+
+  input[type="password"],
+  textarea,
+  input[type="text"],
+  select {
+    /* background-color will now be controlled by --input-background-color */
+    color: var(--text-color);
+    border-color: var(--border-color);
+  }
+
+  input[type="password"]:focus,
+  textarea:focus,
+  input[type="text"]:focus,
+  select:focus {
+    box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.5);
+  }
+
+  .slider:before {
+    background-color: #1c1c1e;
+  }
+
+  ul#hiddenTopics li {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
 }
 
 body {
@@ -80,7 +122,7 @@ textarea {
   border: 1px solid var(--border-color);
   border-radius: 6px;
   box-sizing: border-box;
-  background-color: #fdfdff;
+  background-color: var(--input-background-color); /* Use variable */
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -228,7 +270,7 @@ select {
   border: 1px solid var(--border-color);
   border-radius: 6px;
   box-sizing: border-box;
-  background-color: #fdfdff;
+  background-color: var(--input-background-color); /* Use variable */
   transition: border-color 0.2s, box-shadow 0.2s;
   -webkit-appearance: menulist-button; /* Use native dropdown arrow */
   -moz-appearance: menulist-button;
@@ -241,7 +283,7 @@ input[type="text"] {
   border: 1px solid var(--border-color);
   border-radius: 6px;
   box-sizing: border-box;
-  background-color: #fdfdff;
+  background-color: var(--input-background-color); /* Use variable */
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 

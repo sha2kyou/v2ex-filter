@@ -24,6 +24,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // Async response
   }
 
+  if (request.action === "clearBadge") { // 新增：处理 clearBadge 动作
+    console.log("Background: Received clearBadge request.");
+    chrome.action.setBadgeText({text: ''}); // 清除徽章
+    sendResponse({success: true});
+    return true; // Async response
+  }
+
   if (request.topics) {
     chrome.storage.sync.get(['apiKey', 'filterEnabled', 'selectedModel'], async (settings) => {
       if (!settings.apiKey || settings.filterEnabled === false) {
