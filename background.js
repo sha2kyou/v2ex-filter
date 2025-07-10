@@ -40,20 +40,29 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       const keysToGet = request.topics.map(title => `${cacheKeyPrefix}${title}`);
       const cachedData = await chrome.storage.local.get(keysToGet);
 
-      for (const title of request.topics) {
+      for (let i = 0; i < request.topics.length; i++) {
+        const title = request.topics[i];
         const cacheKey = `${cacheKeyPrefix}${title}`;
         const cachedItem = cachedData[cacheKey];
 
+        let is_useless_result;
         if (cachedItem && (now - cachedItem.timestamp < CACHE_DURATION_MS)) {
           // Cache hit and not expired
-          results.push({ is_useless: cachedItem.result });
+          is_useless_result = cachedItem.result;
         } else {
           // Cache miss or expired
-          const is_useless = await isUseless(title, settings.apiKey, settings.selectedModel);
-          results.push({ is_useless });
+          is_useless_result = await isUseless(title, settings.apiKey, settings.selectedModel);
           // Set new cache item with timestamp
-          chrome.storage.local.set({ [cacheKey]: { result: is_useless, timestamp: now } });
+          chrome.storage.local.set({ [cacheKey]: { result: is_useless_result, timestamp: now } });
         }
+        results.push({ is_useless: is_useless_result });
+
+        // Send progress update to content.js
+        chrome.tabs.sendMessage(sender.tab.id, {
+          action: "updateProgress",
+          processedCount: i + 1,
+          totalCount: request.topics.length
+        });
       }
       sendResponse({ results });
     });
