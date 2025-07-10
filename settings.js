@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const promptInput = document.getElementById('promptInput');
   const modelSelect = document.getElementById('modelSelect');
   const customModelInput = document.getElementById('customModelInput');
-  const animatedGradientSwitch = document.getElementById('animatedGradientSwitch'); // 新增
+  const animatedGradientSwitch = document.getElementById('animatedGradientSwitch');
 
   // 默认提示词
   const defaultPrompt = `

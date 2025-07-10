@@ -8,7 +8,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
   allTopicElements = Array.from(topicElements); // Convert NodeList to Array
   const totalTopics = allTopicElements.length;
   let processedTopics = 0;
-  let filterStartTime = 0; // 新增：记录过滤开始时间
+  let filterStartTime = 0;
 
   // Detect page theme colors
   const computedStyle = getComputedStyle(document.body);
@@ -105,7 +105,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
       };
     });
 
-    // 在发送消息前记录开始时间
+    
     filterStartTime = Date.now();
 
     chrome.runtime.sendMessage({topics: topics.map(t => t.title)}, function(response) {
