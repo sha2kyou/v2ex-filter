@@ -147,7 +147,7 @@ function setErrorState(errorMessage) {
 function updateBadge(count) {
   if (count > 0) {
     chrome.action.setBadgeText({text: count.toString()});
-    chrome.action.setBadgeBackgroundColor({color: '#d9534f'});
+    chrome.action.setBadgeBackgroundColor({color: '#000000'});
   } else {
     chrome.action.setBadgeText({text: ''});
   }
