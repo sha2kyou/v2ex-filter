@@ -66,18 +66,10 @@ document.addEventListener('DOMContentLoaded', function() {
     isShowingAll = !isShowingAll; // Toggle state
   });
 
-  function reloadActiveTab() {
-    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-      if (tabs[0]) {
-        chrome.tabs.reload(tabs[0].id);
-      }
-    });
-  }
-
   // Listen for changes in selectedModel and reload tab
   chrome.storage.onChanged.addListener(function(changes, namespace) {
     if (namespace === 'sync' && changes.selectedModel) {
-      reloadActiveTab();
+      chrome.runtime.sendMessage({action: "reloadTab"});
     }
   });
 });

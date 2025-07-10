@@ -76,28 +76,44 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else if (request.hiddenTitles) {
     chrome.storage.local.set({hiddenTitles: request.hiddenTitles});
     updateBadge(request.hiddenTitles.length);
+  } else if (request.action === "reloadTab") {
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+      if (tabs[0]) {
+        chrome.tabs.reload(tabs[0].id);
+      }
+    });
+  } else if (request.action === "getDefaultPrompt") {
+    sendResponse({defaultPrompt: DEFAULT_PROMPT});
   }
   return true; // Indicates that the response is sent asynchronously
 });
 
+const DEFAULT_PROMPT = `你是一位论坛内容审核员。你的任务是判断帖子标题是否属于无用内容。
+无用内容的定义包括：
+
+- 纯情绪表达（发泄、抱怨、阴阳怪气）
+- 无需专业知识的家庭琐事
+- 自我推广（推销服务、APP、会员、产品、社交账号或内容）
+- 中医相关内容
+- 硬件、软件求推荐相关话题
+- 招聘求职信息
+- 地域攻击言论
+- 动物保护话题
+- 封号、审核相关话题
+- 意义不明的标题
+- 离职、跑路相关话题
+
+请分析以下标题，判断是否属于无用内容。
+如果是无用内容，回答"true"；如果不是，回答"false"。
+
+标题: "{title}"
+  `;
+
 async function isUseless(title, apiKey, selectedModel) {
   const API_URL = `https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions`;
 
-  const defaultPrompt = `
-    你是一个论坛的内容审核员。
-    你的任务是判断一个帖子标题是否表明其内容是无用的。
-    无用内容定义为：
-    1. 纯粹的情绪发泄（例如，抱怨、吐槽）。
-    2. 无需任何专业知识、任何人都可以评论的鸡毛蒜皮的家庭琐事。
-
-    请分析以下标题，判断它是否属于无用类别。
-    如果无用，请只回答 "true"，否则回答 "false"。
-
-    标题：“{title}”
-  `;
-
   const settings = await chrome.storage.sync.get('customPrompt');
-  const promptTemplate = settings.customPrompt || defaultPrompt;
+  const promptTemplate = settings.customPrompt || DEFAULT_PROMPT;
   const prompt = promptTemplate.replace('{title}', title);
 
   try {

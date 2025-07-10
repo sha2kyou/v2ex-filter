@@ -1,0 +1,34 @@
+body {
+  max-width: 600px;
+  margin: 0 auto;
+  min-height: 400px;
+}
+
+textarea {
+  min-height: 150px;
+}
+
+.actions {
+  flex-direction: row;
+}
+
+#hiddenTopicsContainer {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+ul#hiddenTopics {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+ul#hiddenTopics li {
+  padding: 8px;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+ul#hiddenTopics li:last-child {
+  border-bottom: none;
+}

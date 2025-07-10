@@ -9,8 +9,21 @@ document.addEventListener('DOMContentLoaded', function() {
   const customModelInput = document.getElementById('customModelInput');
   const animatedGradientSwitch = document.getElementById('animatedGradientSwitch');
 
-  // 默认提示词
-  const defaultPrompt = `
+  // Load saved settings
+  chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled'], async function(data) {
+    if (data.apiKey) {
+      apiKeyInput.value = data.apiKey;
+    }
+    filterSwitch.checked = data.filterEnabled !== false; // Default to true
+
+    let defaultPrompt = '';
+    try {
+      const response = await chrome.runtime.sendMessage({action: "getDefaultPrompt"});
+      defaultPrompt = response.defaultPrompt;
+    } catch (e) {
+      console.error("Error getting default prompt from background:", e);
+      // Fallback to a hardcoded default if background script is not ready or throws error
+      defaultPrompt = `
     你是一个论坛的内容审核员。
     你的任务是判断一个帖子标题是否表明其内容是无用的。
     无用内容定义为：
@@ -22,13 +35,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     标题：“{title}”
   `;
-
-  // Load saved settings
-  chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled'], function(data) {
-    if (data.apiKey) {
-      apiKeyInput.value = data.apiKey;
     }
-    filterSwitch.checked = data.filterEnabled !== false; // Default to true
+
     promptInput.value = data.customPrompt || defaultPrompt;
     animatedGradientSwitch.checked = data.animatedGradientEnabled !== false; // Default to true
 
@@ -85,18 +93,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  function reloadActiveTab() {
-    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-      if (tabs[0]) {
-        chrome.tabs.reload(tabs[0].id);
-      }
-    });
-  }
-
   // Listen for changes in selectedModel and reload tab
   chrome.storage.onChanged.addListener(function(changes, namespace) {
     if (namespace === 'sync' && changes.selectedModel) {
-      reloadActiveTab();
+      chrome.runtime.sendMessage({action: "reloadTab"});
     }
   });
 });
