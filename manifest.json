@@ -3,7 +3,7 @@
   "manifest_version": 3,
   "name": "V2EX 话题过滤器",
   "version": "1.0",
-  "description": "使用百炼 AI 过滤 V2EX 话题。",
+  "description": "使用 AI 过滤 V2EX 话题。",
   "permissions": [
     "storage",
     "activeTab",
