@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Load saved settings
   function loadSettings() {
-    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled'], function(data) {
+    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled', 'aiIntensity'], function(data) {
       const settingsToSave = {};
 
       if (data.apiKey) {
@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Export settings
   exportSettingsButton.addEventListener('click', function() {
-    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled'], function(data) {
+    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled', 'aiIntensity'], function(data) {
       const settingsJson = JSON.stringify(data, null, 2);
       const blob = new Blob([settingsJson], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
