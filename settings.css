@@ -205,22 +205,6 @@ select {
   margin-top: -1px !important; /* Overlap slightly to ensure no gap */
 }
 
-/* New class for connected input fields */
-.connected-top {
-  border-bottom-left-radius: 0 !important;
-  border-bottom-right-radius: 0 !important;
-  margin-bottom: 0 !important; /* Ensure no margin below */
-}
-
-.connected-bottom {
-  border-top-left-radius: 0 !important;
-  border-top-right-radius: 0 !important;
-  border-top: none !important; /* Remove top border to merge visually */
-  margin-top: -1px !important; /* Overlap slightly to ensure no gap */
-}
-
-
-
 .actions {
   display: flex;
   gap: 10px;

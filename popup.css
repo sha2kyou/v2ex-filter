@@ -319,15 +319,6 @@ ul#hiddenTopics li:last-child {
   flex-grow: 1;
 }
 
-/* Style for "No hidden topics" message */
-.no-topics-message {
-  text-align: center;
-  color: var(--label-color); /* Use a slightly muted color */
-  padding: 16px; /* Add some padding */
-  font-style: italic; /* Make it italic */
-  border-bottom: none !important; /* Ensure no border */
-}
-
 /* Toast Notifications */
 #toastContainer {
   position: fixed;
