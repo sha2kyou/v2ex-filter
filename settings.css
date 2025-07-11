@@ -328,6 +328,43 @@ input:checked + .slider:before {
   display: none;
 }
 
+/* AI Intensity Segmented Control */
+.segmented-control {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  background-color: var(--secondary-background);
+  margin-top: 6px; /* Add some space from the label */
+}
+
+.segmented-control button {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  background-color: transparent;
+  color: var(--text-color);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  border-radius: 0; /* Remove individual button border-radius */
+}
+
+.segmented-control button:hover {
+  background-color: var(--secondary-background-hover);
+}
+
+.segmented-control button.active {
+  background-color: var(--primary-accent);
+  color: white;
+  font-weight: 600;
+}
+
+.segmented-control button.active:hover {
+  background-color: var(--primary-accent-hover);
+}
+
 /* Toast Notifications */
 #toastContainer {
   position: fixed;

@@ -129,7 +129,7 @@ async function isUseless(title, apiKey, selectedModel) {
     你的任务是判断一个帖子标题是否表明其内容是无用的。
     无用内容定义为：
     1. 纯粹的情绪发泄（例如，抱怨、吐槽）。
-    2. 无需任何专业知识、任何人都可以评论的鸡毛蒜皮的家庭琐事。
+    2. 无需任何专业知识、任何人都可以评论的鸡毛蒜琐事。
 
     请分析以下标题，判断它是否属于无用类别。
     如果无用，请只回答 "true" 或 "false"。
@@ -137,9 +137,24 @@ async function isUseless(title, apiKey, selectedModel) {
     标题：“{title}”
   `;
 
-  const settings = await chrome.storage.sync.get('customPrompt');
+  const settings = await chrome.storage.sync.get(['customPrompt', 'aiIntensity']);
   const promptTemplate = settings.customPrompt || defaultPrompt;
-  const prompt = promptTemplate.replace('{title}', title);
+  let aiInstruction = '';
+
+  switch (settings.aiIntensity) {
+    case 'low':
+      aiInstruction = '请你非常宽松地判断，只有非常明显、毫无疑问的无用内容才应标记为无用。';
+      break;
+    case 'high':
+      aiInstruction = '请你非常严格地判断，任何沾边的无用内容都应标记为无用。';
+      break;
+    case 'medium':
+    default:
+      aiInstruction = '请你正常判断。';
+      break;
+  }
+
+  const prompt = `${promptTemplate.replace('{title}', title)}\n${aiInstruction}`;
 
   try {
     const response = await fetch(API_URL, {

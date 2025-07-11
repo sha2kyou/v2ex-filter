@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const modelSelect = document.getElementById('modelSelect');
   const customModelInput = document.getElementById('customModelInput');
   const animatedGradientSwitch = document.getElementById('animatedGradientSwitch');
+  const aiIntensityButtons = document.querySelectorAll('#aiIntensitySegmentedControl button');
 
   // New elements for import/export
   const exportSettingsButton = document.getElementById('exportSettings');
@@ -79,6 +80,10 @@ document.addEventListener('DOMContentLoaded', function() {
       animatedGradientSwitch.checked = data.animatedGradientEnabled !== false; // Default to true
       settingsToSave.animatedGradientEnabled = animatedGradientSwitch.checked;
 
+      const initialAiIntensity = data.aiIntensity || 'medium'; // Default to medium
+      updateIntensityButtons(initialAiIntensity);
+      settingsToSave.aiIntensity = initialAiIntensity;
+
       if (data.selectedModel && (data.selectedModel === 'qwen-turbo' || data.selectedModel === 'qwen-plus')) {
         modelSelect.value = data.selectedModel;
         customModelInput.classList.add('hidden');
@@ -105,6 +110,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
   loadSettings(); // Initial load
 
+  // AI Intensity Segmented Control Logic
+  function updateIntensityButtons(selectedIntensity) {
+    aiIntensityButtons.forEach(button => {
+      if (button.dataset.intensity === selectedIntensity) {
+        button.classList.add('active');
+      } else {
+        button.classList.remove('active');
+      }
+    });
+  }
+
   // Auto-save settings on change
   apiKeyInput.addEventListener('input', function() {
     saveSetting('apiKey', apiKeyInput.value);
@@ -120,6 +136,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
   animatedGradientSwitch.addEventListener('change', function() {
     saveSetting('animatedGradientEnabled', animatedGradientSwitch.checked);
+  });
+
+  // Add event listeners to intensity buttons
+  aiIntensityButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const newIntensity = this.dataset.intensity;
+      saveSetting('aiIntensity', newIntensity);
+      updateIntensityButtons(newIntensity); // Update UI immediately
+    });
   });
 
   modelSelect.addEventListener('change', function() {

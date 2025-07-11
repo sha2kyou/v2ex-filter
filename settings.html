@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="settings.css">
 </head>
 <body>
-  <h1>V2EX 智能过滤器设置</h1>
 
   <main id="settingsView">
     <section class="setting-section">
@@ -54,6 +53,15 @@
         <div class="form-field">
           <label for="promptInput">自定义提示词:</label>
           <textarea id="promptInput" rows="3"></textarea>
+        </div>
+        <div class="divider"></div>
+        <div class="setting-item">
+          <label>AI 过滤强度:</label>
+          <div id="aiIntensitySegmentedControl" class="segmented-control">
+            <button data-intensity="low">低</button>
+            <button data-intensity="medium">中</button>
+            <button data-intensity="high">高</button>
+          </div>
         </div>
       </fieldset>
     </section>
