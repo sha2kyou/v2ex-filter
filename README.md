@@ -2,9 +2,6 @@
 
 这是一个浏览器扩展，使用 AI 根据用户定义的标准过滤 V2EX 话题。它可以帮助您从 V2EX 动态中隐藏“无用”或不相关的话题，提供更清爽的浏览体验。
 
-<img width="1603" height="495" alt="image" src="https://github.com/user-attachments/assets/26a19e93-3538-4778-a4e5-879a6df21ded" />
-
-
 ## 主要功能
 
 *   **AI 过滤：** 利用 AI 分析话题标题并判断其相关性。
@@ -32,6 +29,12 @@
 ## 使用
 
 安装并配置后，访问 [V2EX](https://www.v2ex.com/)，扩展程序将自动根据您的设置过滤话题。
+
+## 截图
+
+<img width="1603" height="495" alt="image" src="https://github.com/user-attachments/assets/26a19e93-3538-4778-a4e5-879a6df21ded" />
+<img width="468" height="490" alt="image" src="https://github.com/user-attachments/assets/c11f8245-6c3b-429c-922b-e09a86386c10" />
+<img width="638" height="773" alt="image" src="https://github.com/user-attachments/assets/ceda9743-7707-4b89-89af-22e7b0bc3ab6" />
 
 ## 致谢
 
