@@ -59,7 +59,7 @@ body {
   width: 320px;
   min-height: 300px; /* Reverted min-height */
   max-height: 600px; /* Set max-height */
-  padding: 16px 16px 24px 16px;
+  padding: 8px 16px 24px 16px;
   background-color: var(--background-color);
   color: var(--text-color);
 }
@@ -75,7 +75,7 @@ h1 {
   font-size: 18px;
   font-weight: 600;
   color: var(--text-color);
-  margin-top: 16px;
+  margin-top: 8px;
   margin-bottom: 16px;
 }
 
@@ -224,33 +224,39 @@ ul#hiddenTopics {
 }
 
 ul#hiddenTopics li {
-  padding: 8px;
+  padding: 8px 8px 8px 0;
   font-size: 14px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  display: flex; /* Added for flexbox layout */
-  justify-content: space-between; /* Added to space out content and button */
-  align-items: center; /* Added to vertically align content and button */
+  display: flex;
+  align-items: center; /* Vertically align content and button */
+  gap: 8px; /* Add space between button and title */
 }
 
 /* Style for the delete button */
 .delete-button {
-  background-color: var(--secondary-background); /* Use secondary background color */
-  color: var(--text-color); /* Use text color for 'x' */
+  background-color: var(--secondary-background);
+  color: var(--label-color);
   border: none;
-  border-radius: 50%; /* Make it circular */
-  width: 20px; /* Small size */
-  height: 20px;
-  font-size: 12px;
-  line-height: 20px; /* Center the 'x' */
+  border-radius: 50%;
+  width: 22px; /* Slightly larger for better tap target */
+  height: 22px;
+  font-size: 13px; /* Slightly larger font */
+  line-height: 22px; /* Center the 'x' */
   text-align: center;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s; /* Add transform to transition */
-  flex-shrink: 0; /* Prevent button from shrinking */
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+  transition: background-color 0.2s, transform 0.1s, color 0.2s;
+  flex-shrink: 0;
+  box-shadow: none;
+}
+
+ul#hiddenTopics li .topic-title {
+  flex-grow: 1; /* Allow title to take remaining space */
+  word-break: break-word; /* Ensure long words break */
 }
 
 .delete-button:hover {
-  background-color: var(--secondary-background-hover); /* Darker grey on hover */
+  background-color: var(--primary-accent);
+  color: white;
 }
 
 .delete-button:active {

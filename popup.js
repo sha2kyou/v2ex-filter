@@ -57,8 +57,8 @@ document.addEventListener('DOMContentLoaded', function() {
             deleteHiddenTopic(title);
           });
 
-          li.appendChild(titleSpan);
           li.appendChild(deleteButton);
+          li.appendChild(titleSpan);
           hiddenTopicsList.appendChild(li);
         });
       } else {
