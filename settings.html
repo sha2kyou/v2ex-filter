@@ -35,7 +35,10 @@
       <fieldset class="setting-group">
         <div class="form-field">
           <label for="apiKey">百炼 API 密钥:</label>
-          <input type="password" id="apiKey">
+          <div class="api-key-input-group">
+            <input type="password" id="apiKey">
+            <button id="testApiKey" class="secondary">测试</button>
+          </div>
         </div>
         <div class="divider"></div>
         <div class="setting-item">
@@ -55,9 +58,7 @@
       </fieldset>
     </section>
 
-    <div class="actions">
-      <button id="save">保存设置</button>
-    </div>
+    
 
     <section class="setting-section">
       <h2 class="section-title">设置导入/导出</h2>

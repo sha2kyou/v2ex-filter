@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
   const apiKeyInput = document.getElementById('apiKey');
-  const saveButton = document.getElementById('save');
   const filterSwitch = document.getElementById('filterSwitch');
   const promptInput = document.getElementById('promptInput');
   const modelSelect = document.getElementById('modelSelect');
@@ -12,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const importSettingsButton = document.getElementById('importSettings');
   const importFileInput = document.getElementById('importFile'); // Get reference to the hidden file input
   const toastContainer = document.getElementById('toastContainer');
+  const testApiKeyButton = document.getElementById('testApiKey');
 
   // Function to show toast notifications
   function showToast(message, type = 'success') {
@@ -32,6 +32,18 @@ document.addEventListener('DOMContentLoaded', function() {
         toast.remove();
       }, { once: true });
     }, 1500);
+  }
+
+  // Helper function to save settings
+  function saveSetting(key, value) {
+    chrome.storage.sync.set({ [key]: value }, function() {
+      if (chrome.runtime.lastError) {
+        console.error(`Error saving ${key}:`, chrome.runtime.lastError);
+        showToast(`保存 ${key} 失败。`, 'error');
+      } else {
+        showToast(`设置已保存。`);
+      }
+    });
   }
 
   // 默认提示词
@@ -93,41 +105,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
   loadSettings(); // Initial load
 
-  // Check for API errors
-  chrome.storage.local.get('apiError', function(data) {
-    if (data.apiError) {
-      showToast(`API 错误: ${data.apiError}`, 'error');
-      chrome.storage.local.remove('apiError'); // Clear the error after displaying
-    }
+  // Auto-save settings on change
+  apiKeyInput.addEventListener('input', function() {
+    saveSetting('apiKey', apiKeyInput.value);
   });
 
-  // Save filter switch state
+  promptInput.addEventListener('change', function() {
+    saveSetting('customPrompt', promptInput.value);
+  });
+
   filterSwitch.addEventListener('change', function() {
-    chrome.storage.sync.set({filterEnabled: filterSwitch.checked});
+    saveSetting('filterEnabled', filterSwitch.checked);
   });
 
-  // Show/hide custom model input based on selection
+  animatedGradientSwitch.addEventListener('change', function() {
+    saveSetting('animatedGradientEnabled', animatedGradientSwitch.checked);
+  });
+
   modelSelect.addEventListener('change', function() {
-    if (modelSelect.value === 'other') {
+    let selectedModel = modelSelect.value;
+    if (selectedModel === 'other') {
+      selectedModel = customModelInput.value; // Use custom input if 'other' is selected
       customModelInput.classList.remove('hidden');
     } else {
       customModelInput.classList.add('hidden');
     }
+    saveSetting('selectedModel', selectedModel);
   });
 
-  // Save API key and custom prompt
-  saveButton.addEventListener('click', function() {
-    const apiKey = apiKeyInput.value;
-    const customPrompt = promptInput.value;
-    let selectedModel = modelSelect.value;
-    const animatedGradientEnabled = animatedGradientSwitch.checked;
-    if (selectedModel === 'other') {
-      selectedModel = customModelInput.value; // Use custom input if 'other' is selected
+  customModelInput.addEventListener('input', function() {
+    if (modelSelect.value === 'other') {
+      saveSetting('selectedModel', customModelInput.value);
     }
-    chrome.storage.sync.set({apiKey: apiKey, customPrompt: customPrompt, selectedModel: selectedModel, animatedGradientEnabled: animatedGradientEnabled}, function() {
-      showToast('设置已保存。');
-    });
   });
+
+  // Check for API errors
 
   // Export settings
   exportSettingsButton.addEventListener('click', function() {
@@ -143,6 +155,30 @@ document.addEventListener('DOMContentLoaded', function() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       showToast('设置已导出到 v2ex_filter_settings.json。');
+    });
+  });
+
+  // Test API Key
+  testApiKeyButton.addEventListener('click', function() {
+    const apiKey = apiKeyInput.value;
+    let selectedModel = modelSelect.value;
+    if (selectedModel === 'other') {
+      selectedModel = customModelInput.value;
+    }
+
+    if (!apiKey) {
+      showToast('请输入 API 密钥。', 'error');
+      return;
+    }
+
+    showToast('正在测试 API 密钥...', 'info');
+
+    chrome.runtime.sendMessage({ action: "testApiKey", apiKey: apiKey, selectedModel: selectedModel }, function(response) {
+      if (response && response.success) {
+        showToast('API 密钥测试成功！', 'success');
+      } else {
+        showToast(`API 密钥测试失败: ${response.error || '未知错误'}`, 'error');
+      }
     });
   });
 

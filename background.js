@@ -31,6 +31,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // Async response
   }
 
+  if (request.action === "testApiKey") {
+    console.log("Background: Received testApiKey request.");
+    const { apiKey, selectedModel } = request;
+    // Use a dummy title to test the API key
+    isUseless("这是一个测试标题", apiKey, selectedModel)
+      .then(result => {
+        sendResponse({ success: true });
+        setErrorState(null); // Clear any previous API errors on successful test
+      })
+      .catch(error => {
+        console.error("Background: API Key test failed:", error);
+        sendResponse({ success: false, error: error.message });
+        setErrorState(error.message); // Set error state on failed test
+      });
+    return true; // Indicates that the response is sent asynchronously
+  }
+
   if (request.topics) {
     chrome.storage.sync.get(['apiKey', 'filterEnabled', 'selectedModel'], async (settings) => {
       if (!settings.apiKey || settings.filterEnabled === false) {
@@ -54,7 +71,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           is_useless_result = cachedItem[cacheKey].result;
         } else {
           // Cache miss or expired
-          is_useless_result = await isUseless(title, settings.apiKey, settings.selectedModel);
+          try {
+            is_useless_result = await isUseless(title, settings.apiKey, settings.selectedModel);
+            setErrorState(null); // Clear API error on successful AI call
+          } catch (error) {
+            console.error("Background: Error during AI processing:", error);
+            setErrorState(error.message); // Set API error on failed AI call
+            is_useless_result = false; // Default to not hiding on error
+          }
           // Set new cache item with timestamp
           await chrome.storage.local.set({ [cacheKey]: { result: is_useless_result, timestamp: now } });
         }
@@ -139,12 +163,10 @@ async function isUseless(title, apiKey, selectedModel) {
 
     const data = await response.json();
     const result = data.choices[0].message.content.trim().toLowerCase();
-    setErrorState(null); // Clear error on success
     return result === 'true';
   } catch (error) {
     console.error('Error calling Bailian API:', error);
-    setErrorState(error.message);
-    return false; // Default to not hiding the post in case of an error
+    throw error; // Re-throw the error so the caller can catch it
   }
 }
 

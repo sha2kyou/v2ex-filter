@@ -139,6 +139,22 @@ select {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+.api-key-input-group {
+  display: flex;
+  gap: 10px; /* Space between input and button */
+  align-items: center;
+}
+
+.api-key-input-group input[type="password"] {
+  flex-grow: 1; /* Allow input to take available space */
+}
+
+.api-key-input-group button {
+  flex-shrink: 0; /* Prevent button from shrinking */
+  width: auto; /* Allow button to size based on content */
+  padding: 10px 15px; /* Adjust padding for the button */
+}
+
 input[type="password"]:focus,
 textarea:focus,
 input[type="text"]:focus,
