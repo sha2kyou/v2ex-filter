@@ -365,6 +365,14 @@ input:checked + .slider:before {
   background-color: var(--primary-accent-hover);
 }
 
+/* AI Intensity Description */
+#aiIntensityDescription {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--label-color);
+  padding: 0 4px;
+}
+
 /* Toast Notifications */
 #toastContainer {
   position: fixed;

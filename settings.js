@@ -14,6 +14,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const toastContainer = document.getElementById('toastContainer');
   const testApiKeyButton = document.getElementById('testApiKey');
 
+  const intensityDescriptions = {
+    low: 'AI 将非常宽松地判断，只有非常明显、毫无疑问的无用内容才会被过滤。适合希望保留大部分内容的用户。',
+    medium: 'AI 将正常判断，平衡过滤效果和内容保留。适合大多数用户。',
+    high: 'AI 将非常严格地判断，任何沾边的无用内容都可能被过滤。适合希望获得最清爽体验的用户。',
+  };
+
   // Function to show toast notifications
   function showToast(message, type = 'success') {
     const toast = document.createElement('div');
@@ -119,6 +125,9 @@ document.addEventListener('DOMContentLoaded', function() {
         button.classList.remove('active');
       }
     });
+    if (aiIntensityDescription) {
+      aiIntensityDescription.textContent = intensityDescriptions[selectedIntensity];
+    }
   }
 
   // Auto-save settings on change
