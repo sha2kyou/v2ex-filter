@@ -2,6 +2,7 @@ chrome.runtime.sendMessage({action: "clearBadge"});
 
 let allTopicElements = []; // Store all topic elements
 let currentHiddenTitles = []; // Store currently hidden titles
+let isErrorDisplayed = false; // Flag to indicate if an error has been displayed
 
 // Function to apply filter based on currentHiddenTitles
 function applyFilter() {
@@ -148,6 +149,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
         allTopicElements.forEach(element => {
           element.style.display = 'block';
         });
+        isErrorDisplayed = true; // Set flag to true
         setTimeout(() => {
           progressBarContainer.style.display = 'none';
         }, 3000); // Keep error message visible for longer
@@ -157,6 +159,10 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
 
   // Listen for progress updates from background.js
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (isErrorDisplayed) { // If an error has been displayed, stop processing progress updates
+      return;
+    }
+
     if (request.action === "updateProgress") {
       processedTopics = request.processedCount;
       const progress = (processedTopics / totalTopics) * 100;
