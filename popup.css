@@ -57,7 +57,8 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   width: 320px;
-  min-height: 400px; /* Reverted to previous minimum height */
+  min-height: 300px; /* Further reduced height for less empty space */
+  max-height: 450px; /* Added max-height */
   padding: 16px;
   background-color: var(--background-color);
   color: var(--text-color);
@@ -218,92 +219,97 @@ ul#hiddenTopics li {
   padding: 8px;
   font-size: 14px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex; /* Added for flexbox layout */
+  justify-content: space-between; /* Added to space out content and button */
+  align-items: center; /* Added to vertically align content and button */
+}
+
+/* Style for the delete button */
+.delete-button {
+  background-color: var(--secondary-background); /* Use secondary background color */
+  color: var(--text-color); /* Use text color for 'x' */
+  border: none;
+  border-radius: 50%; /* Make it circular */
+  width: 20px; /* Small size */
+  height: 20px;
+  font-size: 12px;
+  line-height: 20px; /* Center the 'x' */
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s; /* Add transform to transition */
+  flex-shrink: 0; /* Prevent button from shrinking */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+}
+
+.delete-button:hover {
+  background-color: var(--secondary-background-hover); /* Darker grey on hover */
+}
+
+.delete-button:active {
+  transform: scale(0.95); /* Add active state for feedback */
 }
 
 ul#hiddenTopics li:last-child {
   border-bottom: none;
 }
 
-/* Toggle Switch CSS */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 24px;
-}
-
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
+/* Custom Modal Styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  transition: .4s;
-  border-radius: 24px;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
 }
 
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 20px;
-  width: 20px;
-  left: 2px;
-  bottom: 2px;
-  background-color: white;
-  transition: .4s;
-  border-radius: 50%;
+/* Style for "No hidden topics" message */
+.no-topics-message {
+  text-align: center;
+  color: var(--label-color); /* Use a slightly muted color */
+  padding: 16px; /* Add some padding */
+  font-style: italic; /* Make it italic */
+  border-bottom: none !important; /* Ensure no border */
 }
 
-input:checked + .slider {
-  background-color: var(--primary-accent);
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px var(--primary-accent);
-}
-
-input:checked + .slider:before {
-  transform: translateX(20px);
-}
-
-select {
-  width: 100%;
-  padding: 10px 30px 10px 10px; /* Add right padding for the arrow */
+.modal-content {
+  background-color: var(--card-background);
+  margin: auto; /* Auto margins for centering */
+  padding: 20px;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  box-sizing: border-box;
-  background-color: var(--input-background-color); /* Use variable */
-  transition: border-color 0.2s, box-shadow 0.2s;
-  -webkit-appearance: menulist-button; /* Use native dropdown arrow */
-  -moz-appearance: menulist-button;
-  appearance: menulist-button;
+  border-radius: 10px;
+  width: 80%; /* Could be responsive */
+  max-width: 300px; /* Max width for larger screens */
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  text-align: center;
 }
 
-input[type="text"] {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  box-sizing: border-box;
-  background-color: var(--input-background-color); /* Use variable */
-  transition: border-color 0.2s, box-shadow 0.2s;
+.modal-content p {
+  margin-bottom: 20px;
+  font-size: 16px;
+  color: var(--text-color);
 }
 
-select:focus,
-input[type="text"]:focus {
-  outline: none;
-  border-color: var(--primary-accent);
-  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+.modal-buttons {
+  display: flex;
+  justify-content: space-around;
+  gap: 10px;
 }
 
-.setting-item {
-  margin-bottom: 16px; /* Add some spacing below the model select */
+.modal-buttons button {
+  flex-grow: 1;
+}
+
+/* Style for "No hidden topics" message */
+.no-topics-message {
+  text-align: center;
+  color: var(--label-color); /* Use a slightly muted color */
+  padding: 16px; /* Add some padding */
+  font-style: italic; /* Make it italic */
+  border-bottom: none !important; /* Ensure no border */
 }

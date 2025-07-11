@@ -5,18 +5,92 @@ document.addEventListener('DOMContentLoaded', function() {
   const toggleFilterButton = document.getElementById('toggleFilterButton');
   const status = document.getElementById('status');
 
+  // Modal elements
+  const confirmationModal = document.getElementById('confirmationModal');
+  const confirmClearCacheButton = document.getElementById('confirmClearCache');
+  const cancelClearCacheButton = document.getElementById('cancelClearCache');
+
   let isShowingAll = false; // Initial state: showing filtered topics (button says "显示全部" to switch to all)
 
-  // Load and display hidden topics
-  chrome.storage.local.get('hiddenTitles', function(data) {
-    if (data.hiddenTitles) {
-      data.hiddenTitles.forEach(function(title) {
+  // Function to render hidden topics
+  function renderHiddenTopics() {
+    hiddenTopicsList.innerHTML = ''; // Clear existing list
+    chrome.storage.local.get('hiddenTitles', function(data) {
+      if (data.hiddenTitles && data.hiddenTitles.length > 0) {
+        data.hiddenTitles.forEach(function(title) {
+          const li = document.createElement('li');
+          const titleSpan = document.createElement('span');
+          titleSpan.textContent = title;
+          titleSpan.classList.add('topic-title'); // Add a class for styling if needed
+
+          const deleteButton = document.createElement('span');
+          deleteButton.textContent = 'x';
+          deleteButton.classList.add('delete-button');
+          deleteButton.title = '取消隐藏'; // Updated tooltip
+
+          deleteButton.addEventListener('click', function() {
+            deleteHiddenTopic(title);
+          });
+
+          li.appendChild(titleSpan);
+          li.appendChild(deleteButton);
+          hiddenTopicsList.appendChild(li);
+        });
+      } else {
         const li = document.createElement('li');
-        li.textContent = title;
+        li.textContent = '暂无隐藏话题。';
+        li.classList.add('no-topics-message'); // Add new class
         hiddenTopicsList.appendChild(li);
+      }
+    });
+  }
+
+  // Function to delete a hidden topic (and mark as not useless in cache)
+  function deleteHiddenTopic(titleToDelete) {
+    chrome.storage.local.get('hiddenTitles', function(data) {
+      let hiddenTitles = data.hiddenTitles || [];
+      const updatedHiddenTitles = hiddenTitles.filter(title => title !== titleToDelete);
+
+      // Update the cache for this specific topic to mark it as not useless
+      const cacheKey = `v2ex-filter-cache:${titleToDelete}`;
+      chrome.storage.local.get(cacheKey, function(cacheData) {
+        const cachedItem = cacheData[cacheKey];
+        if (cachedItem) {
+          cachedItem.result = false; // Mark as not useless
+          cachedItem.timestamp = Date.now(); // Update timestamp to refresh cache
+          chrome.storage.local.set({ [cacheKey]: cachedItem }, function() {
+            if (chrome.runtime.lastError) {
+              console.error('Error updating cache for topic:', chrome.runtime.lastError);
+            }
+          });
+        }
       });
-    }
-  });
+
+      chrome.storage.local.set({hiddenTitles: updatedHiddenTitles}, function() {
+        if (chrome.runtime.lastError) {
+          console.error('Error saving hiddenTitles:', chrome.runtime.lastError);
+          status.textContent = '操作失败。';
+        } else {
+          status.textContent = '话题已标记为不隐藏。'; // Updated status message
+          renderHiddenTopics(); // Re-render the list
+
+          // Notify content.js to re-filter the page
+          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            if (tabs[0]) {
+              // Send the updated hiddenTitles to content.js so it can re-apply the filter
+              chrome.tabs.sendMessage(tabs[0].id, {action: "updateHiddenTitlesAndRefilter", hiddenTitles: updatedHiddenTitles});
+            }
+          });
+        }
+        setTimeout(function() {
+          status.textContent = '';
+        }, 2000);
+      });
+    });
+  }
+
+  // Initial load of hidden topics
+  renderHiddenTopics();
 
   // Open settings page
   openSettingsButton.addEventListener('click', function() {
@@ -27,17 +101,34 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Clear cache
+  // Clear cache button click handler
   clearCacheButton.addEventListener('click', function() {
+    confirmationModal.style.display = 'flex'; // Show the modal
+  });
+
+  // Confirm clear cache
+  confirmClearCacheButton.addEventListener('click', function() {
     chrome.runtime.sendMessage({action: "clearCache"}, function(response) {
       if (response.success) {
         status.textContent = '缓存已清除。';
-        hiddenTopicsList.innerHTML = ''; // Clear the displayed list
+        renderHiddenTopics(); // Re-render to show "暂无隐藏话题"
+        setTimeout(function() {
+          status.textContent = '';
+        }, 2000);
+      } else {
+        status.textContent = '清除缓存失败。';
+        console.error('Clear cache failed:', response.error);
         setTimeout(function() {
           status.textContent = '';
         }, 2000);
       }
+      confirmationModal.style.display = 'none'; // Hide the modal
     });
+  });
+
+  // Cancel clear cache
+  cancelClearCacheButton.addEventListener('click', function() {
+    confirmationModal.style.display = 'none'; // Hide the modal
   });
 
   // Toggle filter button

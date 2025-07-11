@@ -3,6 +3,19 @@ chrome.runtime.sendMessage({action: "clearBadge"});
 let allTopicElements = []; // Store all topic elements
 let currentHiddenTitles = []; // Store currently hidden titles
 
+// Function to apply filter based on currentHiddenTitles
+function applyFilter() {
+  allTopicElements.forEach(element => {
+    const link = element.querySelector('.item_title > a');
+    const title = link ? link.innerText : '';
+    if (currentHiddenTitles.includes(title)) {
+      element.style.display = 'none';
+    } else {
+      element.style.display = 'block';
+    }
+  });
+}
+
 chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(data) {
   const topicElements = document.querySelectorAll('div.cell.item');
   allTopicElements = Array.from(topicElements); // Convert NodeList to Array
@@ -104,7 +117,6 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
         element: element
       };
     });
-
     
     filterStartTime = Date.now();
 
@@ -163,15 +175,11 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
         element.style.display = 'block';
       });
     } else if (request.action === "showFilteredTopics") {
-      allTopicElements.forEach(element => {
-        const link = element.querySelector('.item_title > a');
-        const title = link ? link.innerText : '';
-        if (currentHiddenTitles.includes(title)) {
-          element.style.display = 'none';
-        } else {
-          element.style.display = 'block';
-        }
-      });
+      applyFilter(); // Use the new applyFilter function
+    } else if (request.action === "updateHiddenTitlesAndRefilter") {
+      currentHiddenTitles = request.hiddenTitles; // Update the hidden titles
+      applyFilter(); // Re-apply the filter with the new hidden titles
+      chrome.runtime.sendMessage({hiddenTitles: currentHiddenTitles}); // Update badge in background.js
     }
   });
 });
