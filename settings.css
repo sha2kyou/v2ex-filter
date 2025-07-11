@@ -120,7 +120,8 @@ label {
 }
 
 div.form-field > label,
-.setting > label {
+.setting > label,
+.setting-item > label {
     font-weight: 500;
     color: var(--text-color);
 }
@@ -166,7 +167,7 @@ select:focus {
 
 textarea {
   resize: vertical;
-  min-height: 100px; /* Adjusted min-height for textarea */
+  min-height: 150px; /* Adjusted min-height for textarea */
 }
 
 select {
@@ -178,6 +179,47 @@ select {
   background-position: right 8px center;
   padding-right: 30px; /* Make space for the arrow */
 }
+
+/* Specific adjustments for dropdowns followed by custom inputs */
+#modelSelect,
+#apiUrlSelect {
+  margin-bottom: 0; /* Remove space below select */
+}
+
+#customModelInput,
+#customApiUrlInput {
+  margin-top: 0; /* Remove space above input */
+}
+
+/* New class for connected input fields */
+.connected-top {
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  margin-bottom: 0 !important; /* Ensure no margin below */
+}
+
+.connected-bottom {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-top: none !important; /* Remove top border to merge visually */
+  margin-top: -1px !important; /* Overlap slightly to ensure no gap */
+}
+
+/* New class for connected input fields */
+.connected-top {
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  margin-bottom: 0 !important; /* Ensure no margin below */
+}
+
+.connected-bottom {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-top: none !important; /* Remove top border to merge visually */
+  margin-top: -1px !important; /* Overlap slightly to ensure no gap */
+}
+
+
 
 .actions {
   display: flex;

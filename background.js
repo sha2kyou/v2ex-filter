@@ -33,9 +33,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   if (request.action === "testApiKey") {
     console.log("Background: Received testApiKey request.");
-    const { apiKey, selectedModel } = request;
+    const { apiKey, selectedModel, apiUrl } = request;
     // Use a dummy title to test the API key
-    isUseless("这是一个测试标题", apiKey, selectedModel)
+    isUseless("这是一个测试标题", apiKey, selectedModel, apiUrl)
       .then(result => {
         sendResponse({ success: true });
         setErrorState(null); // Clear any previous API errors on successful test
@@ -49,7 +49,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   if (request.topics) {
-    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'selectedModel'], async (settings) => {
+    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'selectedModel', 'apiUrl', 'selectedApiUrl', 'customApiUrl'], async (settings) => {
       if (!settings.apiKey || settings.filterEnabled === false) {
         sendResponse({results: request.topics.map(() => ({ is_useless: false }))});
         return;
@@ -72,8 +72,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         } else {
           // Cache miss or expired
           try {
-            is_useless_result = await isUseless(title, settings.apiKey, settings.selectedModel);
-            setErrorState(null); // Clear API error on successful AI call
+            let currentApiUrl = settings.apiUrl; // Default to the direct apiUrl if available
+            if (settings.selectedApiUrl === 'dashscope') {
+              currentApiUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
+            } else if (settings.selectedApiUrl === 'other') {
+              currentApiUrl = settings.customApiUrl;
+            }
+            is_useless_result = await isUseless(title, settings.apiKey, settings.selectedModel, currentApiUrl);
+            setErrorState(null); // Clear any previous API errors on successful test
           } catch (error) {
             console.error("Background: Error during AI processing:", error);
             setErrorState(error.message); // Set API error on failed AI call
@@ -121,8 +127,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return true; // Indicates that the response is sent asynchronously
 });
 
-async function isUseless(title, apiKey, selectedModel) {
-  const API_URL = `https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions`;
+async function isUseless(title, apiKey, selectedModel, apiUrl) {
+  const API_URL = apiUrl || 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
 
   const defaultPrompt = `
     你是一个论坛的内容审核员。

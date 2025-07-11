@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
   const apiKeyInput = document.getElementById('apiKey');
+  const apiUrlSelect = document.getElementById('apiUrlSelect');
+  const customApiUrlInput = document.getElementById('customApiUrlInput');
   const filterSwitch = document.getElementById('filterSwitch');
   const promptInput = document.getElementById('promptInput');
   const modelSelect = document.getElementById('modelSelect');
@@ -19,6 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
     medium: 'AI 将正常判断，平衡过滤效果和内容保留。适合大多数用户。',
     high: 'AI 将非常严格地判断，任何沾边的无用内容都可能被过滤。适合希望获得最清爽体验的用户。',
   };
+
+  
 
   // Function to show toast notifications
   function showToast(message, type = 'success') {
@@ -47,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (chrome.runtime.lastError) {
         console.error(`Error saving ${key}:`, chrome.runtime.lastError);
         showToast(`保存 ${key} 失败。`, 'error');
-      } else {
+      } else if (key !== 'selectedModel' && key !== 'selectedApiUrl') {
         showToast(`设置已保存。`);
       }
     });
@@ -69,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Load saved settings
   function loadSettings() {
-    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled', 'aiIntensity'], function(data) {
+    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled', 'aiIntensity', 'selectedApiUrl', 'customApiUrl'], function(data) {
       const settingsToSave = {};
 
       if (data.apiKey) {
@@ -90,19 +94,44 @@ document.addEventListener('DOMContentLoaded', function() {
       updateIntensityButtons(initialAiIntensity);
       settingsToSave.aiIntensity = initialAiIntensity;
 
-      if (data.selectedModel && (data.selectedModel === 'qwen-turbo' || data.selectedModel === 'qwen-plus')) {
-        modelSelect.value = data.selectedModel;
-        customModelInput.classList.add('hidden');
-        settingsToSave.selectedModel = data.selectedModel;
-      } else if (data.selectedModel) {
-        modelSelect.value = 'other';
-        customModelInput.value = data.selectedModel;
-        customModelInput.classList.remove('hidden');
+      // Handle AI Model selection
+      if (data.selectedModel) {
+        if (data.selectedModel === 'qwen-turbo') {
+          modelSelect.value = data.selectedModel;
+          customModelInput.classList.add('hidden');
+          modelSelect.classList.remove('connected-top');
+          customModelInput.classList.remove('connected-bottom');
+        } else {
+          modelSelect.value = 'other';
+          customModelInput.value = data.customModel || ''; // Use customModel from storage or empty string
+          customModelInput.classList.remove('hidden');
+          modelSelect.classList.add('connected-top');
+          customModelInput.classList.add('connected-bottom');
+        }
         settingsToSave.selectedModel = data.selectedModel;
       } else {
         modelSelect.value = 'qwen-turbo'; // Default
         customModelInput.classList.add('hidden');
+        modelSelect.classList.remove('connected-top');
+        customModelInput.classList.remove('connected-bottom');
         settingsToSave.selectedModel = 'qwen-turbo';
+      }
+
+      // Handle API URL selection
+      const initialApiUrl = data.selectedApiUrl || 'dashscope'; // Default to dashscope
+      apiUrlSelect.value = initialApiUrl;
+      settingsToSave.selectedApiUrl = initialApiUrl;
+
+      if (initialApiUrl === 'other') {
+        customApiUrlInput.value = data.customApiUrl || ''; // Use customApiUrl from storage or empty string
+        customApiUrlInput.classList.remove('hidden');
+        apiUrlSelect.classList.add('connected-top');
+        customApiUrlInput.classList.add('connected-bottom');
+        settingsToSave.customApiUrl = customApiUrlInput.value;
+      } else {
+        customApiUrlInput.classList.add('hidden');
+        apiUrlSelect.classList.remove('connected-top');
+        customApiUrlInput.classList.remove('connected-bottom');
       }
 
       // Save all settings back to storage.sync to ensure all fields are present
@@ -131,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Auto-save settings on change
-  apiKeyInput.addEventListener('input', function() {
+  apiKeyInput.addEventListener('change', function() {
     saveSetting('apiKey', apiKeyInput.value);
   });
 
@@ -157,19 +186,42 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   modelSelect.addEventListener('change', function() {
-    let selectedModel = modelSelect.value;
+    const selectedModel = modelSelect.value;
     if (selectedModel === 'other') {
-      selectedModel = customModelInput.value; // Use custom input if 'other' is selected
       customModelInput.classList.remove('hidden');
+      modelSelect.classList.add('connected-top');
+      customModelInput.classList.add('connected-bottom');
     } else {
       customModelInput.classList.add('hidden');
+      modelSelect.classList.remove('connected-top');
+      customModelInput.classList.remove('connected-bottom');
     }
     saveSetting('selectedModel', selectedModel);
   });
 
-  customModelInput.addEventListener('input', function() {
+  customModelInput.addEventListener('change', function() {
     if (modelSelect.value === 'other') {
-      saveSetting('selectedModel', customModelInput.value);
+      saveSetting('customModel', customModelInput.value);
+    }
+  });
+
+  apiUrlSelect.addEventListener('change', function() {
+    const selectedApiUrl = apiUrlSelect.value;
+    if (selectedApiUrl === 'other') {
+      customApiUrlInput.classList.remove('hidden');
+      apiUrlSelect.classList.add('connected-top');
+      customApiUrlInput.classList.add('connected-bottom');
+    } else {
+      customApiUrlInput.classList.add('hidden');
+      apiUrlSelect.classList.remove('connected-top');
+      customApiUrlInput.classList.remove('connected-bottom');
+    }
+    saveSetting('selectedApiUrl', selectedApiUrl);
+  });
+
+  customApiUrlInput.addEventListener('change', function() {
+    if (apiUrlSelect.value === 'other') {
+      saveSetting('customApiUrl', customApiUrlInput.value);
     }
   });
 
@@ -177,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Export settings
   exportSettingsButton.addEventListener('click', function() {
-    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled', 'aiIntensity'], function(data) {
+    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'customModel', 'animatedGradientEnabled', 'aiIntensity', 'selectedApiUrl', 'customApiUrl'], function(data) {
       const settingsJson = JSON.stringify(data, null, 2);
       const blob = new Blob([settingsJson], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -199,6 +251,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (selectedModel === 'other') {
       selectedModel = customModelInput.value;
     }
+    let apiUrl = apiUrlSelect.value;
+    if (apiUrl === 'other') {
+      apiUrl = customApiUrlInput.value;
+    } else if (apiUrl === 'dashscope') {
+      apiUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
+    }
 
     if (!apiKey) {
       showToast('请输入 API 密钥。', 'error');
@@ -207,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     showToast('正在测试 API 密钥...', 'info');
 
-    chrome.runtime.sendMessage({ action: "testApiKey", apiKey: apiKey, selectedModel: selectedModel }, function(response) {
+    chrome.runtime.sendMessage({ action: "testApiKey", apiKey: apiKey, selectedModel: selectedModel, apiUrl: apiUrl }, function(response) {
       if (response && response.success) {
         showToast('API 密钥测试成功！', 'success');
       } else {
@@ -246,6 +304,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  
+
   function reloadActiveTab() {
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
       if (tabs[0]) {
@@ -256,8 +316,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Listen for changes in selectedModel and reload tab
   chrome.storage.onChanged.addListener(function(changes, namespace) {
-    if (namespace === 'sync' && changes.selectedModel) {
-      reloadActiveTab();
-    }
+    // if (namespace === 'sync' && changes.selectedModel) {
+    //   reloadActiveTab();
+    // }
   });
 });

@@ -33,7 +33,16 @@
       <h2 class="section-title">AI 过滤设置</h2>
       <fieldset class="setting-group">
         <div class="form-field">
-          <label for="apiKey">百炼 API 密钥:</label>
+          <label for="apiUrlSelect">API URL:</label>
+          <select id="apiUrlSelect">
+            <option value="dashscope">阿里百炼 (默认)</option>
+            <option value="other">其他大模型服务 (自定义 URL)</option>
+          </select>
+          <input type="text" id="customApiUrlInput" placeholder="输入自定义 API URL" class="hidden">
+        </div>
+        <div class="divider"></div>
+        <div class="form-field">
+          <label for="apiKey">API 密钥:</label>
           <div class="api-key-input-group">
             <input type="password" id="apiKey">
             <button id="testApiKey" class="secondary">测试</button>
@@ -44,15 +53,10 @@
           <label for="modelSelect">AI 模型:</label>
           <select id="modelSelect">
             <option value="qwen-turbo">qwen-turbo</option>
-            <option value="qwen-plus">qwen-plus</option>
+            
             <option value="other">其他 (在下方指定)</option>
           </select>
           <input type="text" id="customModelInput" placeholder="输入自定义模型名称" class="hidden">
-        </div>
-        <div class="divider"></div>
-        <div class="form-field">
-          <label for="promptInput">自定义提示词:</label>
-          <textarea id="promptInput" rows="3"></textarea>
         </div>
         <div class="divider"></div>
         <div class="setting-item">
@@ -63,6 +67,12 @@
             <button data-intensity="high">高</button>
           </div>
           <div id="aiIntensityDescription" class="setting-description"></div>
+          
+        </div>
+        <div class="divider"></div>
+        <div class="form-field">
+          <label for="promptInput">自定义提示词:</label>
+          <textarea id="promptInput" rows="5"></textarea>
         </div>
       </fieldset>
     </section>
