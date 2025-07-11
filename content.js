@@ -138,6 +138,19 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
         setTimeout(() => {
           progressBarContainer.style.display = 'none';
         }, 500);
+      } else if (response && response.error) {
+        // Handle error from background.js
+        console.error("Content.js: Error from background script:", response.error);
+        progressText.textContent = `AI 过滤失败: ${response.error}`; // Display error message
+        progressBar.style.width = '100%'; // Fill progress bar to indicate completion/error
+        progressBar.style.backgroundColor = 'var(--danger-color)'; // Change color to red
+        // Show all topics when AI filtering fails
+        allTopicElements.forEach(element => {
+          element.style.display = 'block';
+        });
+        setTimeout(() => {
+          progressBarContainer.style.display = 'none';
+        }, 3000); // Keep error message visible for longer
       }
     });
   }

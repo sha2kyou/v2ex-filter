@@ -78,6 +78,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.error("Background: Error during AI processing:", error);
             setErrorState(error.message); // Set API error on failed AI call
             is_useless_result = false; // Default to not hiding on error
+            // Send error to content.js
+            sendResponse({ error: error.message });
+            return; // Stop further processing for this request
           }
           // Set new cache item with timestamp
           await chrome.storage.local.set({ [cacheKey]: { result: is_useless_result, timestamp: now } });
