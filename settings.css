@@ -129,6 +129,7 @@ div.form-field > label,
 input[type="password"],
 textarea,
 input[type="text"],
+input[type="number"],
 select {
   width: 100%;
   padding: 10px;
@@ -138,6 +139,24 @@ select {
   background-color: var(--input-background-color);
   color: var(--text-color); /* Ensure text color is set */
   transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Specific width adjustments */
+select,
+input[type="text"] {
+  /* max-width: 50%; /* Half width for select and text inputs */
+}
+
+input[type="number"] {
+  width: 80px; /* Adjust width for number input */
+  -moz-appearance: textfield; /* Firefox */
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .api-key-input-group {
@@ -159,6 +178,7 @@ select {
 input[type="password"]:focus,
 textarea:focus,
 input[type="text"]:focus,
+input[type="number"]:focus,
 select:focus {
   outline: none;
   border-color: var(--primary-accent);
@@ -180,7 +200,18 @@ select {
   padding-right: 30px; /* Make space for the arrow */
 }
 
-/* Specific adjustments for dropdowns followed by custom inputs */
+input[type="number"] {
+  width: 80px; /* Adjust width for number input */
+  -moz-appearance: textfield; /* Firefox */
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 #modelSelect,
 #apiUrlSelect {
   margin-bottom: 0; /* Remove space below select */
@@ -188,7 +219,7 @@ select {
 
 #customModelInput,
 #customApiUrlInput {
-  margin-top: 0; /* Remove space above input */
+    margin-top: 0; /* Remove space above input */
 }
 
 /* New class for connected input fields */

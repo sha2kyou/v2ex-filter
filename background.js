@@ -49,7 +49,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   if (request.topics) {
-    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'selectedModel', 'apiUrl', 'selectedApiUrl', 'customApiUrl'], async (settings) => {
+    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'selectedModel', 'apiUrl', 'selectedApiUrl', 'customApiUrl', 'concurrencyLimit'], async (settings) => {
       if (!settings.apiKey || settings.filterEnabled === false) {
         sendResponse({results: request.topics.map(() => ({ is_useless: false }))});
         return;
@@ -103,7 +103,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return { is_useless: is_useless_result };
       };
 
-      const CONCURRENCY_LIMIT = 5; // Limit concurrent AI requests
+      const CONCURRENCY_LIMIT = settings.concurrencyLimit || 5; // Limit concurrent AI requests, default to 5
       const results = [];
       const promises = [];
 

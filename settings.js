@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const customModelInput = document.getElementById('customModelInput');
   const animatedGradientSwitch = document.getElementById('animatedGradientSwitch');
   const aiIntensityButtons = document.querySelectorAll('#aiIntensitySegmentedControl button');
+  const concurrencyLimitInput = document.getElementById('concurrencyLimit');
 
   // New elements for import/export
   const exportSettingsButton = document.getElementById('exportSettings');
@@ -73,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Load saved settings
   function loadSettings() {
-    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled', 'aiIntensity', 'selectedApiUrl', 'customApiUrl'], function(data) {
+    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled', 'aiIntensity', 'selectedApiUrl', 'customApiUrl', 'concurrencyLimit'], function(data) {
       const settingsToSave = {};
 
       if (data.apiKey) {
@@ -93,6 +94,14 @@ document.addEventListener('DOMContentLoaded', function() {
       const initialAiIntensity = data.aiIntensity || 'medium'; // Default to medium
       updateIntensityButtons(initialAiIntensity);
       settingsToSave.aiIntensity = initialAiIntensity;
+
+      // 处理 concurrencyLimit
+      let loadedConcurrencyLimit = data.concurrencyLimit;
+      if (typeof loadedConcurrencyLimit !== 'number' || loadedConcurrencyLimit < 1) {
+        loadedConcurrencyLimit = 5; // 默认值
+      }
+      concurrencyLimitInput.value = loadedConcurrencyLimit;
+      settingsToSave.concurrencyLimit = loadedConcurrencyLimit; // 确保这个值被保存回去
 
       // Handle AI Model selection
       if (data.selectedModel) {
@@ -176,6 +185,15 @@ document.addEventListener('DOMContentLoaded', function() {
     saveSetting('animatedGradientEnabled', animatedGradientSwitch.checked);
   });
 
+  concurrencyLimitInput.addEventListener('change', function() {
+    let value = parseInt(concurrencyLimitInput.value);
+    if (isNaN(value) || value < 1) {
+      value = 1; // Ensure minimum of 1
+      concurrencyLimitInput.value = value;
+    }
+    saveSetting('concurrencyLimit', value);
+  });
+
   // Add event listeners to intensity buttons
   aiIntensityButtons.forEach(button => {
     button.addEventListener('click', function() {
@@ -229,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Export settings
   exportSettingsButton.addEventListener('click', function() {
-    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'customModel', 'animatedGradientEnabled', 'aiIntensity', 'selectedApiUrl', 'customApiUrl'], function(data) {
+    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'customModel', 'animatedGradientEnabled', 'aiIntensity', 'selectedApiUrl', 'customApiUrl', 'concurrencyLimit'], function(data) {
       const settingsJson = JSON.stringify(data, null, 2);
       const blob = new Blob([settingsJson], { type: 'application/json' });
       const url = URL.createObjectURL(blob);

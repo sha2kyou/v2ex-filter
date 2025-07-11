@@ -59,6 +59,12 @@
           <input type="text" id="customModelInput" placeholder="输入自定义模型名称" class="hidden">
         </div>
         <div class="divider"></div>
+        <div class="form-field">
+          <label for="concurrencyLimit">AI 并发处理数量:</label>
+          <input type="number" id="concurrencyLimit" min="1" value="5">
+          <p class="setting-description" style="color: var(--danger-color);">请注意：并发处理数量过高可能导致 AI 服务限流、成本增加或处理速度变慢。推荐值：5。</p>
+        </div>
+        <div class="divider"></div>
         <div class="setting-item">
           <label>AI 过滤强度:</label>
           <div id="aiIntensitySegmentedControl" class="segmented-control">
