@@ -9,7 +9,7 @@
   <h1>V2EX 过滤器</h1>
 
   <div id="hiddenTopicsView">
-    <h2 class="section-title">已隐藏话题</h2>
+    <h2 class="section-title">已隐藏话题 <span id="hiddenTopicsCount" class="section-subtitle"></span></h2>
     <div class="setting-group">
         <div id="hiddenTopicsContainer">
           <ul id="hiddenTopics"></ul>
@@ -24,7 +24,6 @@
         <button id="clearCache" class="secondary">清除缓存</button>
       </div>
     </div>
-    <div id="status"></div>
   </div>
 
   <!-- Custom Confirmation Modal -->
@@ -39,5 +38,6 @@
   </div>
 
   <script src="popup.js"></script>
+  <div id="toastContainer"></div>
 </body>
 </html>

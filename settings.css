@@ -67,11 +67,15 @@ h1 {
   margin: 0 0 16px 0;
 }
 
+main {
+  padding-bottom: 20px; /* Add some padding at the bottom of the main content */
+}
+
 .section-title {
   font-size: 18px;
   font-weight: 600;
   color: var(--text-color);
-  margin-top: 16px;
+  margin-top: 24px; /* Increased margin-top for better separation */
   margin-bottom: 16px;
 }
 
@@ -79,9 +83,22 @@ h1 {
   background-color: var(--card-background);
   border-radius: 10px;
   padding: 16px;
-  margin-top: 0; 
   margin-bottom: 16px;
   border: 1px solid var(--border-color);
+}
+
+fieldset.setting-group {
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+legend {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color);
+  padding: 0 8px;
 }
 
 .setting {
@@ -102,29 +119,30 @@ label {
   margin-bottom: 6px;
 }
 
-div.form-field > label {
-    font-weight: 500;
-    color: var(--text-color);
-}
-
+div.form-field > label,
 .setting > label {
     font-weight: 500;
     color: var(--text-color);
 }
 
 input[type="password"],
-textarea {
+textarea,
+input[type="text"],
+select {
   width: 100%;
   padding: 10px;
   border: 1px solid var(--border-color);
   border-radius: 6px;
   box-sizing: border-box;
-  background-color: var(--input-background-color); /* Use variable */
+  background-color: var(--input-background-color);
+  color: var(--text-color); /* Ensure text color is set */
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 input[type="password"]:focus,
-textarea:focus {
+textarea:focus,
+input[type="text"]:focus,
+select:focus {
   outline: none;
   border-color: var(--primary-accent);
   box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
@@ -132,13 +150,24 @@ textarea:focus {
 
 textarea {
   resize: vertical;
-  min-height: 150px;
+  min-height: 100px; /* Adjusted min-height for textarea */
+}
+
+select {
+  -webkit-appearance: none; /* Remove default arrow */
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%238e8e93" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); /* Custom arrow */
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 30px; /* Make space for the arrow */
 }
 
 .actions {
   display: flex;
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 24px; /* Increased margin-top for actions */
+  margin-bottom: 16px;
 }
 
 button {
@@ -169,6 +198,16 @@ button.secondary {
 
 button.secondary:hover {
   background-color: var(--secondary-background-hover);
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.button-group button {
+  flex-grow: 1;
 }
 
 #promptEditor button {
@@ -260,36 +299,55 @@ input:checked + .slider:before {
   transform: translateX(20px);
 }
 
-select {
-  width: 100%;
-  padding: 10px 30px 10px 10px; /* Add right padding for the arrow */
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  box-sizing: border-box;
-  background-color: var(--input-background-color); /* Use variable */
-  transition: border-color 0.2s, box-shadow 0.2s;
-  -webkit-appearance: menulist-button; /* Use native dropdown arrow */
-  -moz-appearance: menulist-button;
-  appearance: menulist-button;
-}
-
-input[type="text"] {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  box-sizing: border-box;
-  background-color: var(--input-background-color); /* Use variable */
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-select:focus,
-input[type="text"]:focus {
-  outline: none;
-  border-color: var(--primary-accent);
-  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
-}
-
 .setting-item {
-  margin-bottom: 16px; /* Add some spacing below the model select */
+  margin-bottom: 16px;
+}
+
+.divider {
+  border-top: 1px solid var(--border-color);
+  margin: 16px 0;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Toast Notifications */
+#toastContainer {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.toast {
+  background-color: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  transform: translateY(20px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  text-align: center;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.success {
+  background-color: var(--primary-accent);
+}
+
+.toast.error {
+  background-color: var(--danger-color);
 }

@@ -8,58 +8,73 @@
 <body>
   <h1>V2EX 智能过滤器设置</h1>
 
-  <div id="settingsView">
-    <h2 class="section-title">通用设置</h2>
-    <div class="setting-group">
-      <div class="setting">
-        <label for="filterSwitch">启用过滤</label>
-        <label class="switch">
-          <input type="checkbox" id="filterSwitch">
-          <span class="slider"></span>
-        </label>
-      </div>
-      <hr style="border: none; border-top: 1px solid var(--border-color); margin: 16px 0;">
-      <div class="setting">
-        <label for="animatedGradientSwitch">灵动彩带</label>
-        <label class="switch">
-          <input type="checkbox" id="animatedGradientSwitch">
-          <span class="slider"></span>
-        </label>
-      </div>
-    </div>
+  <main id="settingsView">
+    <section class="setting-section">
+      <h2 class="section-title">通用设置</h2>
+      <fieldset class="setting-group">
+        <div class="setting">
+          <label for="filterSwitch">启用过滤</label>
+          <label class="switch">
+            <input type="checkbox" id="filterSwitch">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="divider"></div>
+        <div class="setting">
+          <label for="animatedGradientSwitch">灵动彩带</label>
+          <label class="switch">
+            <input type="checkbox" id="animatedGradientSwitch">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </fieldset>
+    </section>
 
-    <h2 class="section-title">AI 过滤设置</h2>
-    <div class="setting-group">
-      <div class="form-field">
-        <label for="apiKey">百炼 API 密钥:</label>
-        <input type="password" id="apiKey">
-      </div>
-      <hr style="border: none; border-top: 1px solid var(--border-color); margin: 16px 0;">
-      <div class="setting-item">
-        <label for="modelSelect">AI 模型:</label>
-        <select id="modelSelect">
-          <option value="qwen-turbo">qwen-turbo</option>
-          <option value="qwen-plus">qwen-plus</option>
-          <option value="other">其他 (在下方指定)</option>
-        </select>
-        <input type="text" id="customModelInput" placeholder="输入自定义模型名称" style="display: none;">
-      </div>
-      <hr style="border: none; border-top: 1px solid var(--border-color); margin: 16px 0;">
-      <div class="form-field">
-        <label for="promptInput">自定义提示词:</label>
-        <textarea id="promptInput" rows="3"></textarea>
-      </div>
-    </div>
+    <section class="setting-section">
+      <h2 class="section-title">AI 过滤设置</h2>
+      <fieldset class="setting-group">
+        <div class="form-field">
+          <label for="apiKey">百炼 API 密钥:</label>
+          <input type="password" id="apiKey">
+        </div>
+        <div class="divider"></div>
+        <div class="setting-item">
+          <label for="modelSelect">AI 模型:</label>
+          <select id="modelSelect">
+            <option value="qwen-turbo">qwen-turbo</option>
+            <option value="qwen-plus">qwen-plus</option>
+            <option value="other">其他 (在下方指定)</option>
+          </select>
+          <input type="text" id="customModelInput" placeholder="输入自定义模型名称" class="hidden">
+        </div>
+        <div class="divider"></div>
+        <div class="form-field">
+          <label for="promptInput">自定义提示词:</label>
+          <textarea id="promptInput" rows="3"></textarea>
+        </div>
+      </fieldset>
+    </section>
 
     <div class="actions">
       <button id="save">保存设置</button>
     </div>
 
-    <div id="status"></div>
-    <div id="errorDisplay" style="display: none;"></div>
+    <section class="setting-section">
+      <h2 class="section-title">设置导入/导出</h2>
+      <fieldset class="setting-group">
+        <input type="file" id="importFile" accept=".json" class="hidden">
+        <div class="button-group">
+          <button id="exportSettings" class="secondary">导出设置</button>
+          <button id="importSettings">导入设置</button>
+        </div>
+      </fieldset>
+    </section>
 
-  </div>
+    <div id="status"></div>
+    <div id="errorDisplay" class="hidden"></div>
+  </main>
 
   <script src="settings.js"></script>
+  <div id="toastContainer"></div>
 </body>
 </html>

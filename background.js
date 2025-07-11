@@ -41,35 +41,49 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       const CACHE_DURATION_MS = 15 * 24 * 60 * 60 * 1000; // 15 days
       const cacheKeyPrefix = 'v2ex-filter-cache:';
       const now = Date.now();
+      const totalTopics = request.topics.length;
+      let processedCount = 0;
 
-      const results = [];
-      // Get all keys we might need
-      const keysToGet = request.topics.map(title => `${cacheKeyPrefix}${title}`);
-      const cachedData = await chrome.storage.local.get(keysToGet);
-
-      for (let i = 0; i < request.topics.length; i++) {
-        const title = request.topics[i];
+      const processTopic = async (title, index) => {
         const cacheKey = `${cacheKeyPrefix}${title}`;
-        const cachedItem = cachedData[cacheKey];
+        const cachedItem = await chrome.storage.local.get(cacheKey);
 
         let is_useless_result;
-        if (cachedItem && (now - cachedItem.timestamp < CACHE_DURATION_MS)) {
+        if (cachedItem[cacheKey] && (now - cachedItem[cacheKey].timestamp < CACHE_DURATION_MS)) {
           // Cache hit and not expired
-          is_useless_result = cachedItem.result;
+          is_useless_result = cachedItem[cacheKey].result;
         } else {
           // Cache miss or expired
           is_useless_result = await isUseless(title, settings.apiKey, settings.selectedModel);
           // Set new cache item with timestamp
-          chrome.storage.local.set({ [cacheKey]: { result: is_useless_result, timestamp: now } });
+          await chrome.storage.local.set({ [cacheKey]: { result: is_useless_result, timestamp: now } });
         }
-        results.push({ is_useless: is_useless_result });
 
+        processedCount++;
         // Send progress update to content.js
         chrome.tabs.sendMessage(sender.tab.id, {
           action: "updateProgress",
-          processedCount: i + 1,
-          totalCount: request.topics.length
+          processedCount: processedCount,
+          totalCount: totalTopics
         });
+
+        return { is_useless: is_useless_result };
+      };
+
+      const CONCURRENCY_LIMIT = 5; // Limit concurrent AI requests
+      const results = [];
+      const promises = [];
+
+      for (let i = 0; i < totalTopics; i++) {
+        const title = request.topics[i];
+        promises.push(processTopic(title, i));
+
+        if (promises.length >= CONCURRENCY_LIMIT || i === totalTopics - 1) {
+          // Wait for the current batch to complete
+          const batchResults = await Promise.all(promises);
+          results.push(...batchResults);
+          promises.length = 0; // Clear the batch
+        }
       }
       sendResponse({ results });
     });
@@ -91,7 +105,7 @@ async function isUseless(title, apiKey, selectedModel) {
     2. 无需任何专业知识、任何人都可以评论的鸡毛蒜皮的家庭琐事。
 
     请分析以下标题，判断它是否属于无用类别。
-    如果无用，请只回答 "true"，否则回答 "false"。
+    如果无用，请只回答 "true" 或 "false"。
 
     标题：“{title}”
   `;

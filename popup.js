@@ -3,12 +3,34 @@ document.addEventListener('DOMContentLoaded', function() {
   const openSettingsButton = document.getElementById('openSettingsButton');
   const clearCacheButton = document.getElementById('clearCache');
   const toggleFilterButton = document.getElementById('toggleFilterButton');
-  const status = document.getElementById('status');
+  const hiddenTopicsCount = document.getElementById('hiddenTopicsCount'); // Get reference to the new span
+  const toastContainer = document.getElementById('toastContainer');
 
   // Modal elements
   const confirmationModal = document.getElementById('confirmationModal');
   const confirmClearCacheButton = document.getElementById('confirmClearCache');
   const cancelClearCacheButton = document.getElementById('cancelClearCache');
+
+  // Function to show toast notifications
+  function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.classList.add('toast', type);
+    toast.textContent = message;
+    toastContainer.appendChild(toast);
+
+    // Show the toast
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 10);
+
+    // Hide and remove the toast after 3 seconds
+    setTimeout(() => {
+      toast.classList.remove('show');
+      toast.addEventListener('transitionend', () => {
+        toast.remove();
+      }, { once: true });
+    }, 1500);
+  }
 
   let isShowingAll = false; // Initial state: showing filtered topics (button says "显示全部" to switch to all)
 
@@ -16,6 +38,9 @@ document.addEventListener('DOMContentLoaded', function() {
   function renderHiddenTopics() {
     hiddenTopicsList.innerHTML = ''; // Clear existing list
     chrome.storage.local.get('hiddenTitles', function(data) {
+      const hiddenCount = data.hiddenTitles ? data.hiddenTitles.length : 0;
+      hiddenTopicsCount.textContent = `(${hiddenCount} 个)`; // Update the count
+
       if (data.hiddenTitles && data.hiddenTitles.length > 0) {
         data.hiddenTitles.forEach(function(title) {
           const li = document.createElement('li');
@@ -69,9 +94,9 @@ document.addEventListener('DOMContentLoaded', function() {
       chrome.storage.local.set({hiddenTitles: updatedHiddenTitles}, function() {
         if (chrome.runtime.lastError) {
           console.error('Error saving hiddenTitles:', chrome.runtime.lastError);
-          status.textContent = '操作失败。';
+          showToast('操作失败。', 'error');
         } else {
-          status.textContent = '话题已标记为不隐藏。'; // Updated status message
+          showToast('话题已标记为不隐藏。'); // Updated status message
           renderHiddenTopics(); // Re-render the list
 
           // Notify content.js to re-filter the page
@@ -82,9 +107,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
           });
         }
-        setTimeout(function() {
-          status.textContent = '';
-        }, 2000);
       });
     });
   }
@@ -110,17 +132,11 @@ document.addEventListener('DOMContentLoaded', function() {
   confirmClearCacheButton.addEventListener('click', function() {
     chrome.runtime.sendMessage({action: "clearCache"}, function(response) {
       if (response.success) {
-        status.textContent = '缓存已清除。';
+        showToast('缓存已清除。');
         renderHiddenTopics(); // Re-render to show "暂无隐藏话题"
-        setTimeout(function() {
-          status.textContent = '';
-        }, 2000);
       } else {
-        status.textContent = '清除缓存失败。';
+        showToast('清除缓存失败。', 'error');
         console.error('Clear cache failed:', response.error);
-        setTimeout(function() {
-          status.textContent = '';
-        }, 2000);
       }
       confirmationModal.style.display = 'none'; // Hide the modal
     });
@@ -137,20 +153,14 @@ document.addEventListener('DOMContentLoaded', function() {
       // Action: switch to filtered view
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {action: "showFilteredTopics"});
-        status.textContent = '显示过滤后话题。';
-        setTimeout(function() {
-          status.textContent = '';
-        }, 2000);
+        showToast('显示过滤后话题。');
       });
       toggleFilterButton.textContent = '显示全部'; // Button text changes to "Show All" (meaning, click me to show all)
     } else { // If currently showing filtered topics (button says "显示全部")
       // Action: switch to all topics view
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {action: "showAllTopics"});
-        status.textContent = '显示所有话题。';
-        setTimeout(function() {
-          status.textContent = '';
-        }, 2000);
+        showToast('显示所有话题。');
       });
       toggleFilterButton.textContent = '显示过滤'; // Button text changes to "Show Filtered" (meaning, click me to show filtered)
     }
