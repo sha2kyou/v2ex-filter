@@ -13,3 +13,6 @@ node_modules/
 
 # Temporary files
 *.tmp
+
+# Gemini CLI notes
+GEMINI.md
