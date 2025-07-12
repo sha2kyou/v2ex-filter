@@ -57,14 +57,14 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
     // Inject animated gradient CSS
     const style = document.createElement('style');
     style.textContent = `
-      @keyframes gradientAnimation {
+      @keyframes gradientFlowAnimation {
         0% { background-position: 0% 50%; }
         100% { background-position: 100% 50%; }
       }
       .animated-gradient {
-        background: linear-gradient(90deg, #00c6ff, #0072ff, #92fe9d, #00c6ff);
-      background-size: 400% 100%; /* Increased size for smoother animation */
-      animation: gradientAnimation 30s linear infinite; /* Longer duration for smoother loop */
+        background: linear-gradient(90deg, #00c6ff, #0072ff, #92fe9d, #00c6ff, #0072ff, #92fe9d); /* More colors for a longer, smoother flow */
+        background-size: 200% 100%; /* Wider background to allow for continuous flow */
+        animation: gradientFlowAnimation 10s linear infinite; /* Adjust duration for desired speed */
       }
     `;
     document.head.appendChild(style);
