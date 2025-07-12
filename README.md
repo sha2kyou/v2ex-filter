@@ -41,6 +41,14 @@
 
 欢迎贡献！请随时提交问题或拉取请求。
 
+## 支持作者 / 赞赏
+
+如果你觉得这个项目对你有帮助，可以请我喝杯瑞幸打折咖啡 ☕：
+<details>
+   <summary>💡 点击查看赞赏方式（微信 / <s>支付宝</s>）</summary>
+   <img src="https://github.com/user-attachments/assets/3205decc-ee4b-4408-84e7-1970ca3e4c30" width="200" />
+</details>
+
 ## 许可证
 
 MIT LICENSE
