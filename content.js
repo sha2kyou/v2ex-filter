@@ -66,6 +66,11 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
         background-size: 200% 100%; /* Wider background to allow for continuous flow */
         animation: gradientFlowAnimation 10s linear infinite; /* Adjust duration for desired speed */
       }
+      .v2ex-filter-blurred {
+        filter: blur(5px); /* Initial blur */
+        pointer-events: none; /* Disable clicks */
+        transition: filter 0.3s ease-out; /* Smooth transition for unblurring */
+      }
     `;
     document.head.appendChild(style);
     progressBar.classList.add('animated-gradient'); // Add the class for animated gradient
@@ -105,7 +110,12 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
     progressText.textContent = `AI 过滤准备中... (0 / ${totalTopics})`;
     progressBarContainer.style.display = 'block';
 
-    // First, hide all topics to ensure consistent behavior
+    // First, apply blur and disable clicks to all topics
+    allTopicElements.forEach(element => {
+      element.classList.add('v2ex-filter-blurred');
+    });
+
+    // Then, hide all topics to ensure consistent behavior
     allTopicElements.forEach(element => {
       element.style.display = 'none';
     });
@@ -138,6 +148,11 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
         // Hide progress bar after a short delay to show completion
         setTimeout(() => {
           progressBarContainer.style.display = 'none';
+          // Remove blur and enable clicks for all topics
+          allTopicElements.forEach(element => {
+            element.classList.remove('v2ex-filter-blurred');
+            element.style.filter = ''; // Clear inline filter style
+          });
         }, 500);
       } else if (response && response.error) {
         // Handle error from background.js
@@ -168,6 +183,12 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
       const progress = (processedTopics / totalTopics) * 100;
       progressBar.style.width = `${progress}%`;
 
+      // Update blur effect
+      const blurValue = Math.max(0, 5 - (progress / 20)); // Blur from 5px down to 0px
+      allTopicElements.forEach(element => {
+        element.style.filter = `blur(${blurValue}px)`;
+      });
+
       let statusText = `AI 过滤中: ${processedTopics} / ${totalTopics} (${progress.toFixed(0)}%)`;
 
       // 计算并显示剩余时间
@@ -187,6 +208,11 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
         // Hide progress bar after a short delay to show completion
         setTimeout(() => {
           progressBarContainer.style.display = 'none';
+          // Remove blur and enable clicks for all topics
+          allTopicElements.forEach(element => {
+            element.classList.remove('v2ex-filter-blurred');
+            element.style.filter = ''; // Clear inline filter style
+          });
         }, 500);
       }
     } else if (request.action === "showAllTopics") {
