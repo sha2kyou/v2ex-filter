@@ -17,7 +17,7 @@ function applyFilter() {
   });
 }
 
-chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(data) {
+chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'suggestedProgressBarEnabled'], function(data) {
   const topicElements = document.querySelectorAll('div.cell.item');
   allTopicElements = Array.from(topicElements); // Convert NodeList to Array
   const totalTopics = allTopicElements.length;
@@ -32,12 +32,13 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
   // Create and append progress bar
   const progressBarContainer = document.createElement('div');
   progressBarContainer.id = 'v2ex-filter-progress-container';
+  const progressBarHeight = data.suggestedProgressBarEnabled ? '5px' : '20px';
   progressBarContainer.style.cssText = `
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 20px; /* Increased height for text */
+    height: ${progressBarHeight}; /* Increased height for text */
     background-color: ${pageBackgroundColor};
     z-index: 9999;
     display: none; /* Hidden by default */
@@ -88,10 +89,11 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
     height: 100%;
     color: ${pageTextColor};
     text-align: center;
-    line-height: 20px; /* Match container height */
+    line-height: ${progressBarHeight}; /* Match container height */
     font-size: 12px;
     font-weight: bold;
     text-shadow: 0 0 2px ${pageBackgroundColor};
+    display: ${data.suggestedProgressBarEnabled ? 'none' : 'block'};
   `;
 
   progressBarContainer.appendChild(progressBar);
@@ -108,6 +110,11 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
   } else {
     // Show progress bar and set initial text
     progressText.textContent = `AI 过滤准备中... (0 / ${totalTopics})`;
+    if (data.suggestedProgressBarEnabled) {
+      progressText.style.display = 'none';
+    } else {
+      progressText.style.display = 'block';
+    }
     progressBarContainer.style.display = 'block';
 
     // First, apply blur and disable clicks to all topics
@@ -157,7 +164,12 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
       } else if (response && response.error) {
         // Handle error from background.js
         console.error("Content.js: Error from background script:", response.error);
-        progressText.textContent = `AI 过滤失败: ${response.error}`; // Display error message
+        progressText.textContent = `AI 过滤失败: ${response.error}`;
+        if (data.suggestedProgressBarEnabled) {
+          progressText.style.display = 'none';
+        } else {
+          progressText.style.display = 'block';
+        }
         progressBar.style.width = '100%'; // Fill progress bar to indicate completion/error
         progressBar.style.backgroundColor = 'var(--danger-color)'; // Change color to red
         // Show all topics when AI filtering fails
@@ -202,7 +214,9 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled'], function(d
         statusText += ` - 正在估算剩余时间...`;
       }
 
-      progressText.textContent = statusText;
+      if (!data.suggestedProgressBarEnabled) {
+        progressText.textContent = statusText;
+      }
 
       if (processedTopics === totalTopics) {
         // Hide progress bar after a short delay to show completion

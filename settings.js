@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const modelSelect = document.getElementById('modelSelect');
   const customModelInput = document.getElementById('customModelInput');
   const animatedGradientSwitch = document.getElementById('animatedGradientSwitch');
+  const suggestedProgressBarSwitch = document.getElementById('suggestedProgressBarSwitch');
   const aiIntensityButtons = document.querySelectorAll('#aiIntensitySegmentedControl button');
   const concurrencyLimitInput = document.getElementById('concurrencyLimit');
 
@@ -74,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Load saved settings
   function loadSettings() {
-    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled', 'aiIntensity', 'selectedApiUrl', 'customApiUrl', 'concurrencyLimit'], function(data) {
+    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled', 'aiIntensity', 'selectedApiUrl', 'customApiUrl', 'concurrencyLimit', 'suggestedProgressBarEnabled'], function(data) {
       const settingsToSave = {};
 
       if (data.apiKey) {
@@ -90,6 +91,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
       animatedGradientSwitch.checked = data.animatedGradientEnabled !== false; // Default to true
       settingsToSave.animatedGradientEnabled = animatedGradientSwitch.checked;
+
+      suggestedProgressBarSwitch.checked = data.suggestedProgressBarEnabled !== false; // Default to true
+      settingsToSave.suggestedProgressBarEnabled = suggestedProgressBarSwitch.checked;
 
       const initialAiIntensity = data.aiIntensity || 'medium'; // Default to medium
       updateIntensityButtons(initialAiIntensity);
@@ -185,6 +189,10 @@ document.addEventListener('DOMContentLoaded', function() {
     saveSetting('animatedGradientEnabled', animatedGradientSwitch.checked);
   });
 
+  suggestedProgressBarSwitch.addEventListener('change', function() {
+    saveSetting('suggestedProgressBarEnabled', suggestedProgressBarSwitch.checked);
+  });
+
   concurrencyLimitInput.addEventListener('change', function() {
     let value = parseInt(concurrencyLimitInput.value);
     if (isNaN(value) || value < 1) {
@@ -247,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Export settings
   exportSettingsButton.addEventListener('click', function() {
-    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'customModel', 'animatedGradientEnabled', 'aiIntensity', 'selectedApiUrl', 'customApiUrl', 'concurrencyLimit'], function(data) {
+    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'customModel', 'animatedGradientEnabled', 'aiIntensity', 'selectedApiUrl', 'customApiUrl', 'concurrencyLimit', 'suggestedProgressBarEnabled'], function(data) {
       const settingsJson = JSON.stringify(data, null, 2);
       const blob = new Blob([settingsJson], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
