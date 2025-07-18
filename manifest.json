@@ -2,7 +2,7 @@
 {
   "manifest_version": 3,
   "name": "V2EX 话题过滤器",
-  "version": "0.0.35",
+  "version": "0.0.43",
   "description": "使用 AI 过滤 V2EX 话题。",
   "permissions": [
     "storage",
