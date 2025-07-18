@@ -1,3 +1,13 @@
+const pokemonNames = [
+  "皮卡丘", "妙蛙种子", "小火龙", "杰尼龟", "伊布", "卡比兽", "超梦", "梦幻",
+  "喷火龙", "水箭龟", "妙蛙花", "雷丘", "胖丁", "可达鸭", "耿鬼", "鲤鱼王",
+  "暴鲤龙", "乘龙", "百变怪", "迷你龙", "快龙", "火焰鸟", "闪电鸟", "急冻鸟"
+];
+
+function getRandomPokemonName() {
+  return pokemonNames[Math.floor(Math.random() * pokemonNames.length)];
+}
+
 chrome.runtime.sendMessage({action: "clearBadge"});
 
 let allTopicElements = []; // Store all topic elements
@@ -61,7 +71,7 @@ function generateRandomGradientColors(numColors = 3) {
   return [...colors, ...colors].join(', ');
 }
 
-chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'suggestedProgressBarEnabled'], function(data) {
+chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProgressBarEnabled'], function(data) {
   const topicElements = document.querySelectorAll('div.cell.item');
   allTopicElements = Array.from(topicElements); // Convert NodeList to Array
   const totalTopics = allTopicElements.length;
@@ -76,7 +86,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'suggestedP
   // Create and append progress bar
   const progressBarContainer = document.createElement('div');
   progressBarContainer.id = 'v2ex-filter-progress-container';
-  const progressBarHeight = data.suggestedProgressBarEnabled ? '5px' : '20px';
+  const progressBarHeight = data.simpleProgressBarEnabled ? '5px' : '20px';
   progressBarContainer.style.cssText = `
     position: fixed;
     top: 0;
@@ -137,7 +147,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'suggestedP
     font-size: 12px;
     font-weight: bold;
     text-shadow: 0 0 2px ${pageBackgroundColor};
-    display: ${data.suggestedProgressBarEnabled ? 'none' : 'block'};
+    display: ${data.simpleProgressBarEnabled ? 'none' : 'block'};
   `;
 
   progressBarContainer.appendChild(progressBar);
@@ -153,8 +163,12 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'suggestedP
     progressBarContainer.style.display = 'none'; // Ensure progress bar is hidden
   } else {
     // Show progress bar and set initial text
-    progressText.textContent = `AI 过滤准备中... (0 / ${totalTopics})`;
-    if (data.suggestedProgressBarEnabled) {
+    if (data.animatedGradientEnabled && !data.simpleProgressBarEnabled) {
+      progressText.textContent = getRandomPokemonName();
+    } else {
+      progressText.textContent = `AI 过滤准备中... (0 / ${totalTopics})`;
+    }
+    if (data.simpleProgressBarEnabled) {
       progressText.style.display = 'none';
     } else {
       progressText.style.display = 'block';
@@ -209,7 +223,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'suggestedP
         // Handle error from background.js
         console.error("Content.js: Error from background script:", response.error);
         progressText.textContent = `AI 过滤失败: ${response.error}`;
-        if (data.suggestedProgressBarEnabled) {
+        if (data.simpleProgressBarEnabled) {
           progressText.style.display = 'none';
         } else {
           progressText.style.display = 'block';
@@ -247,18 +261,22 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'suggestedP
 
       let statusText = `AI 过滤中: ${processedTopics} / ${totalTopics} (${progress.toFixed(0)}%)`;
 
-      // 计算并显示剩余时间
-      if (processedTopics > 0 && filterStartTime > 0) {
-        const elapsedTime = (Date.now() - filterStartTime) / 1000; // 已花费时间（秒）
-        const avgTimePerTopic = elapsedTime / processedTopics; // 平均每个话题的处理时间
-        const estimatedRemainingTime = avgTimePerTopic * (totalTopics - processedTopics); // 估算剩余时间
-
-        statusText += ` - 预计剩余 ${Math.max(0, estimatedRemainingTime).toFixed(0)} 秒`; // 确保不显示负数
+      if (data.animatedGradientEnabled && !data.simpleProgressBarEnabled) {
+        statusText = getRandomPokemonName();
       } else {
-        statusText += ` - 正在估算剩余时间...`;
+        // 计算并显示剩余时间
+        if (processedTopics > 0 && filterStartTime > 0) {
+          const elapsedTime = (Date.now() - filterStartTime) / 1000; // 已花费时间（秒）
+          const avgTimePerTopic = elapsedTime / processedTopics; // 平均每个话题的处理时间
+          const estimatedRemainingTime = avgTimePerTopic * (totalTopics - processedTopics); // 估算剩余时间
+
+          statusText += ` - 预计剩余 ${Math.max(0, estimatedRemainingTime).toFixed(0)} 秒`; // 确保不显示负数
+        } else {
+          statusText += ` - 正在估算剩余时间...`;
+        }
       }
 
-      if (!data.suggestedProgressBarEnabled) {
+      if (!data.simpleProgressBarEnabled) {
         progressText.textContent = statusText;
       }
 
