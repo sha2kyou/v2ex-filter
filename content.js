@@ -76,7 +76,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'suggestedP
     document.head.appendChild(style);
     progressBar.classList.add('animated-gradient'); // Add the class for animated gradient
   } else {
-    progressBar.style.backgroundColor = '#4CAF50'; // Green background
+    progressBar.style.backgroundColor = '#2196F3'; // Blue background
   }
 
   const progressText = document.createElement('div');
