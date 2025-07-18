@@ -96,8 +96,16 @@ document.addEventListener('DOMContentLoaded', function() {
       simpleProgressBarSwitch.checked = data.simpleProgressBarEnabled !== false; // Default to true
       settingsToSave.simpleProgressBarEnabled = simpleProgressBarSwitch.checked;
 
-      pokemonReminderSwitch.checked = data.pokemonReminderEnabled !== false; // Default to true
-      settingsToSave.pokemonReminderEnabled = pokemonReminderSwitch.checked;
+      // If simpleProgressBar is enabled, pokemonReminder must be disabled
+      if (simpleProgressBarSwitch.checked) {
+        pokemonReminderSwitch.checked = false;
+        pokemonReminderSwitch.disabled = true;
+        settingsToSave.pokemonReminderEnabled = false; // Ensure it's saved as false
+      } else {
+        pokemonReminderSwitch.checked = data.pokemonReminderEnabled !== false; // Default to true
+        pokemonReminderSwitch.disabled = false;
+        settingsToSave.pokemonReminderEnabled = pokemonReminderSwitch.checked;
+      }
 
       const initialAiIntensity = data.aiIntensity || 'medium'; // Default to medium
       updateIntensityButtons(initialAiIntensity);
@@ -195,6 +203,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
   simpleProgressBarSwitch.addEventListener('change', function() {
     saveSetting('simpleProgressBarEnabled', simpleProgressBarSwitch.checked);
+    if (simpleProgressBarSwitch.checked) {
+      pokemonReminderSwitch.checked = false;
+      pokemonReminderSwitch.disabled = true;
+      saveSetting('pokemonReminderEnabled', false); // Save the disabled state
+    } else {
+      pokemonReminderSwitch.disabled = false;
+      // Restore previous state or default if simpleProgressBar is turned off
+      chrome.storage.sync.get(['pokemonReminderEnabled'], function(data) {
+        pokemonReminderSwitch.checked = data.pokemonReminderEnabled !== false;
+        saveSetting('pokemonReminderEnabled', pokemonReminderSwitch.checked);
+      });
+    }
   });
 
   pokemonReminderSwitch.addEventListener('change', function() {
