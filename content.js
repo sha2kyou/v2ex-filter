@@ -18,12 +18,11 @@ function applyFilter() {
 }
 
 function getRandomColor() {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
+  const minBrightness = 128; // Minimum value for each RGB component (0-255)
+  let r = Math.floor(Math.random() * (256 - minBrightness) + minBrightness);
+  let g = Math.floor(Math.random() * (256 - minBrightness) + minBrightness);
+  let b = Math.floor(Math.random() * (256 - minBrightness) + minBrightness);
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
 function generateRandomGradientColors(numColors = 3) {
