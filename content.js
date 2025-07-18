@@ -164,7 +164,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
   } else {
     // Show progress bar and set initial text
     if (data.animatedGradientEnabled && !data.simpleProgressBarEnabled) {
-      progressText.textContent = `${getRandomPokemonName()} 提醒你：AI 过滤准备中... (0 / ${totalTopics})`;
+      progressText.textContent = `${getRandomPokemonName()} 正在帮你过滤`;
     } else {
       progressText.textContent = `AI 过滤准备中... (0 / ${totalTopics})`;
     }
@@ -262,7 +262,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
       let statusText = `AI 过滤中: ${processedTopics} / ${totalTopics} (${progress.toFixed(0)}%)`;
 
       if (data.animatedGradientEnabled && !data.simpleProgressBarEnabled) {
-        statusText = `${getRandomPokemonName()} 提醒你：AI 过滤中: ${processedTopics} / ${totalTopics} (${progress.toFixed(0)}%)`;
+        statusText = `${getRandomPokemonName()} 正在帮你过滤`;
       } else {
         // 计算并显示剩余时间
         if (processedTopics > 0 && filterStartTime > 0) {
