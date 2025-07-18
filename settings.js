@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const customModelInput = document.getElementById('customModelInput');
   const animatedGradientSwitch = document.getElementById('animatedGradientSwitch');
   const simpleProgressBarSwitch = document.getElementById('suggestedProgressBarSwitch');
+  const pokemonReminderSwitch = document.getElementById('pokemonReminderSwitch');
   const aiIntensityButtons = document.querySelectorAll('#aiIntensitySegmentedControl button');
   const concurrencyLimitInput = document.getElementById('concurrencyLimit');
 
@@ -75,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Load saved settings
   function loadSettings() {
-    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled', 'aiIntensity', 'selectedApiUrl', 'customApiUrl', 'concurrencyLimit', 'simpleProgressBarEnabled'], function(data) {
+    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled', 'aiIntensity', 'selectedApiUrl', 'customApiUrl', 'concurrencyLimit', 'simpleProgressBarEnabled', 'pokemonReminderEnabled'], function(data) {
       const settingsToSave = {};
 
       if (data.apiKey) {
@@ -92,8 +93,11 @@ document.addEventListener('DOMContentLoaded', function() {
       animatedGradientSwitch.checked = data.animatedGradientEnabled !== false; // Default to true
       settingsToSave.animatedGradientEnabled = animatedGradientSwitch.checked;
 
-      suggestedProgressBarSwitch.checked = data.simpleProgressBarEnabled !== false; // Default to true
-      settingsToSave.simpleProgressBarEnabled = suggestedProgressBarSwitch.checked;
+      simpleProgressBarSwitch.checked = data.simpleProgressBarEnabled !== false; // Default to true
+      settingsToSave.simpleProgressBarEnabled = simpleProgressBarSwitch.checked;
+
+      pokemonReminderSwitch.checked = data.pokemonReminderEnabled !== false; // Default to true
+      settingsToSave.pokemonReminderEnabled = pokemonReminderSwitch.checked;
 
       const initialAiIntensity = data.aiIntensity || 'medium'; // Default to medium
       updateIntensityButtons(initialAiIntensity);
@@ -189,8 +193,12 @@ document.addEventListener('DOMContentLoaded', function() {
     saveSetting('animatedGradientEnabled', animatedGradientSwitch.checked);
   });
 
-  suggestedProgressBarSwitch.addEventListener('change', function() {
-    saveSetting('simpleProgressBarEnabled', suggestedProgressBarSwitch.checked);
+  simpleProgressBarSwitch.addEventListener('change', function() {
+    saveSetting('simpleProgressBarEnabled', simpleProgressBarSwitch.checked);
+  });
+
+  pokemonReminderSwitch.addEventListener('change', function() {
+    saveSetting('pokemonReminderEnabled', pokemonReminderSwitch.checked);
   });
 
   concurrencyLimitInput.addEventListener('change', function() {
@@ -255,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Export settings
   exportSettingsButton.addEventListener('click', function() {
-    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'customModel', 'animatedGradientEnabled', 'aiIntensity', 'selectedApiUrl', 'customApiUrl', 'concurrencyLimit', 'simpleProgressBarEnabled'], function(data) {
+    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'customModel', 'animatedGradientEnabled', 'aiIntensity', 'selectedApiUrl', 'customApiUrl', 'concurrencyLimit', 'simpleProgressBarEnabled', 'pokemonReminderEnabled'], function(data) {
       const settingsJson = JSON.stringify(data, null, 2);
       const blob = new Blob([settingsJson], { type: 'application/json' });
       const url = URL.createObjectURL(blob);

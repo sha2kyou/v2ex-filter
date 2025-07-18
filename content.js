@@ -85,7 +85,7 @@ function generateRandomGradientColors(numColors = 3) {
   return [...colors, ...colors].join(', ');
 }
 
-chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProgressBarEnabled'], function(data) {
+chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProgressBarEnabled', 'pokemonReminderEnabled'], function(data) {
   const topicElements = document.querySelectorAll('div.cell.item');
   allTopicElements = Array.from(topicElements); // Convert NodeList to Array
   const totalTopics = allTopicElements.length;
@@ -177,7 +177,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
     progressBarContainer.style.display = 'none'; // Ensure progress bar is hidden
   } else {
     // Show progress bar and set initial text
-    if (data.animatedGradientEnabled && !data.simpleProgressBarEnabled) {
+    if (data.animatedGradientEnabled && !data.simpleProgressBarEnabled && data.pokemonReminderEnabled) {
       progressText.textContent = `${getRandomPokemonName()} 正在帮你过滤 (0 / ${totalTopics}, 0%)`;
     } else {
       progressText.textContent = `AI 过滤准备中... (0 / ${totalTopics})`;
@@ -275,7 +275,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
 
       let statusText = `AI 过滤中: ${processedTopics} / ${totalTopics} (${progress.toFixed(0)}%)`;
 
-      if (data.animatedGradientEnabled && !data.simpleProgressBarEnabled) {
+      if (data.animatedGradientEnabled && !data.simpleProgressBarEnabled && data.pokemonReminderEnabled) {
         statusText = `${getRandomPokemonName()} 正在帮你过滤 (${processedTopics} / ${totalTopics}, ${progress.toFixed(0)}%)`;
       } else {
         // 计算并显示剩余时间
