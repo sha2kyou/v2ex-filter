@@ -17,12 +17,39 @@ function applyFilter() {
   });
 }
 
+function hslToRgb(h, s, l) {
+  let c = (1 - Math.abs(2 * l - 1)) * s,
+    x = c * (1 - Math.abs((h / 60) % 2 - 1)),
+    m = l - c / 2,
+    r = 0,
+    g = 0,
+    b = 0;
+
+  if (0 <= h && h < 60) {
+    r = c; g = x; b = 0;
+  } else if (60 <= h && h < 120) {
+    r = x; g = c; b = 0;
+  } else if (120 <= h && h < 180) {
+    r = 0; g = c; b = x;
+  } else if (180 <= h && h < 240) {
+    r = 0; g = x; b = c;
+  } else if (240 <= h && h < 300) {
+    r = x; g = 0; b = c;
+  } else if (300 <= h && h < 360) {
+    r = c; g = 0; b = x;
+  }
+  r = Math.round((r + m) * 255).toString(16).padStart(2, '0');
+  g = Math.round((g + m) * 255).toString(16).padStart(2, '0');
+  b = Math.round((b + m) * 255).toString(16).padStart(2, '0');
+
+  return `#${r}${g}${b}`;
+}
+
 function getRandomColor() {
-  const minBrightness = 128; // Minimum value for each RGB component (0-255)
-  let r = Math.floor(Math.random() * (256 - minBrightness) + minBrightness);
-  let g = Math.floor(Math.random() * (256 - minBrightness) + minBrightness);
-  let b = Math.floor(Math.random() * (256 - minBrightness) + minBrightness);
-  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  const h = Math.floor(Math.random() * 360); // Hue: 0-360
+  const s = Math.floor(Math.random() * (100 - 70) + 70) / 100; // Saturation: 70-100%
+  const l = Math.floor(Math.random() * (80 - 60) + 60) / 100; // Lightness: 60-80%
+  return hslToRgb(h, s, l);
 }
 
 function generateRandomGradientColors(numColors = 3) {
