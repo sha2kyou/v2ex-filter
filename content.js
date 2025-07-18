@@ -17,6 +17,24 @@ function applyFilter() {
   });
 }
 
+function getRandomColor() {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
+function generateRandomGradientColors(numColors = 3) {
+  let colors = [];
+  for (let i = 0; i < numColors; i++) {
+    colors.push(getRandomColor());
+  }
+  // Duplicate colors to ensure smooth looping for the animation
+  return [...colors, ...colors].join(', ');
+}
+
 chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'suggestedProgressBarEnabled'], function(data) {
   const topicElements = document.querySelectorAll('div.cell.item');
   allTopicElements = Array.from(topicElements); // Convert NodeList to Array
@@ -63,7 +81,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'suggestedP
         100% { background-position: 100% 50%; }
       }
       .animated-gradient {
-        background: linear-gradient(90deg, #00c6ff, #0072ff, #92fe9d, #00c6ff, #0072ff, #92fe9d); /* More colors for a longer, smoother flow */
+        background: linear-gradient(90deg, ${generateRandomGradientColors()});
         background-size: 200% 100%; /* Wider background to allow for continuous flow */
         animation: gradientFlowAnimation 10s linear infinite; /* Adjust duration for desired speed */
       }
