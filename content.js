@@ -126,11 +126,21 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
       }
       .v2ex-filter-blurred {
         filter: blur(5px); /* Initial blur */
-        pointer-events: none; /* Disable clicks */
+        pointer-events: none !important; /* Disable clicks */
         transition: filter 0.3s ease-out; /* Smooth transition for unblurring */
       }
       .v2ex-filter-blurred .v2p-topic-actions {
         pointer-events: none !important; /* Ensure actions are not clickable when blurred */
+      }
+      .v2ex-filter-blurred a {
+        pointer-events: none !important; /* Ensure all links are not clickable when blurred */
+      }
+      .v2ex-filter-blurred:hover,
+      .v2ex-filter-blurred a:hover {
+        cursor: default !important;
+        text-decoration: none !important;
+        background-color: initial !important; /* Reset background color on hover */
+        color: initial !important; /* Reset text color on hover */
       }
     `;
     document.head.appendChild(style);
