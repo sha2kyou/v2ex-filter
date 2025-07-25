@@ -28,18 +28,7 @@ let allTopicElements = []; // Store all topic elements
 let currentHiddenTitles = []; // Store currently hidden titles
 let isErrorDisplayed = false; // Flag to indicate if an error has been displayed
 
-// Function to apply filter based on currentHiddenTitles
-function applyFilter() {
-  allTopicElements.forEach(element => {
-    const link = element.querySelector('.item_title > a');
-    const title = link ? link.innerText : '';
-    if (currentHiddenTitles.includes(title)) {
-      element.style.display = 'none';
-    } else {
-      element.style.display = 'block';
-    }
-  });
-}
+
 
 function hslToRgb(h, s, l) {
   let c = (1 - Math.abs(2 * l - 1)) * s,
@@ -170,9 +159,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
 
   if (data.filterEnabled === false) {
     // If filtering is disabled, show all topics and clear badge
-    allTopicElements.forEach(element => {
-      element.style.display = 'block';
-    });
+    
     chrome.runtime.sendMessage({hiddenTitles: []}); // Clear hidden titles and badge
     progressBarContainer.style.display = 'none'; // Ensure progress bar is hidden
   } else {
@@ -194,70 +181,31 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
       element.classList.add('v2ex-filter-blurred');
     });
 
-    // Then, hide all topics to ensure consistent behavior
-    allTopicElements.forEach(element => {
-      element.style.display = 'none';
-    });
+    
 
     // If filtering is enabled, proceed with the filtering logic
-    const topics = allTopicElements.map(element => {
+    const topics = allTopicElements.map((element, index) => {
       const link = element.querySelector('.item_title > a');
+      const title = link ? link.textContent : '';
       return {
-        title: link ? link.innerText : '',
-        element: element
+        title: title,
+        element: element,
+        index: index
       };
     });
+
     
+    
+    currentHiddenTitles = [];
     filterStartTime = Date.now();
 
-    chrome.runtime.sendMessage({topics: topics.map(t => t.title)}, function(response) {
-      if (response && response.results) {
-        const hiddenTitles = [];
-        response.results.forEach((result, index) => {
-          if (result.is_useless) {
-            topics[index].element.style.display = 'none'; // Explicitly hide useless topics
-            hiddenTitles.push(topics[index].title);
-          } else {
-            // Show the entire container div for useful topics
-            topics[index].element.style.display = 'block';
-          }
-        });
-        currentHiddenTitles = hiddenTitles; // Store hidden titles
-        chrome.runtime.sendMessage({hiddenTitles: hiddenTitles});
-        // Hide progress bar after a short delay to show completion
-        setTimeout(() => {
-          progressBarContainer.style.display = 'none';
-          // Remove blur and enable clicks for all topics
-          allTopicElements.forEach(element => {
-            element.classList.remove('v2ex-filter-blurred');
-            element.style.filter = ''; // Clear inline filter style
-          });
-        }, 500);
-      } else if (response && response.error) {
-        // Handle error from background.js
-        console.error("Content.js: Error from background script:", response.error);
-        progressText.textContent = `AI 过滤失败: ${response.error}`;
-        if (data.simpleProgressBarEnabled) {
-          progressText.style.display = 'none';
-        } else {
-          progressText.style.display = 'block';
-        }
-        progressBar.style.width = '100%'; // Fill progress bar to indicate completion/error
-        progressBar.style.backgroundColor = 'var(--danger-color)'; // Change color to red
-        // Show all topics when AI filtering fails
-        allTopicElements.forEach(element => {
-          element.style.display = 'block';
-        });
-        isErrorDisplayed = true; // Set flag to true
-        setTimeout(() => {
-          progressBarContainer.style.display = 'none';
-        }, 3000); // Keep error message visible for longer
-      }
-    });
+    // Send all topics to background script for processing
+    chrome.runtime.sendMessage({topics: topics.map(t => t.title)});
   }
 
   // Listen for progress updates from background.js
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log('Content: Received message action:', request.action);
     if (isErrorDisplayed) { // If an error has been displayed, stop processing progress updates
       return;
     }
@@ -267,11 +215,19 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
       const progress = (processedTopics / totalTopics) * 100;
       progressBar.style.width = `${progress}%`;
 
-      // Update blur effect
-      const blurValue = Math.max(0, 5 - (progress / 20)); // Blur from 5px down to 0px
-      allTopicElements.forEach(element => {
-        element.style.filter = `blur(${blurValue}px)`;
-      });
+      const topic = allTopicElements[request.index];
+      if (topic) {
+        if (request.is_useless) {
+          const link = topic.querySelector('.item_title > a');
+          if (link) {
+            currentHiddenTitles.push(link.innerText);
+            console.log('Content: Added to currentHiddenTitles. Current count:', currentHiddenTitles.length);
+          }
+        } else {
+          topic.classList.remove('v2ex-filter-blurred');
+          topic.style.filter = ''; // Clear inline filter style
+        }
+      }
 
       let statusText = `AI 过滤中: ${processedTopics} / ${totalTopics} (${progress.toFixed(0)}%)`;
 
@@ -293,28 +249,101 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
       if (!data.simpleProgressBarEnabled) {
         progressText.textContent = statusText;
       }
-
-      if (processedTopics === totalTopics) {
-        // Hide progress bar after a short delay to show completion
-        setTimeout(() => {
-          progressBarContainer.style.display = 'none';
-          // Remove blur and enable clicks for all topics
-          allTopicElements.forEach(element => {
+    } else if (request.action === "filteringComplete") {
+      // Hide progress bar after a short delay to show completion
+      setTimeout(() => {
+        progressBarContainer.style.display = 'none';
+        // Ensure any remaining blurred items are un-blurred if they are not in hiddenTitles
+        allTopicElements.forEach(element => {
+          const link = element.querySelector('.item_title > a');
+          const title = link ? link.innerText : '';
+          if (!currentHiddenTitles.includes(title)) {
             element.classList.remove('v2ex-filter-blurred');
             element.style.filter = ''; // Clear inline filter style
-          });
-        }, 500);
-      }
+          }
+        });
+        // Update the badge with the final count of hidden titles (which are now blurred titles)
+        console.log('Content: Sending final hiddenTitles count:', currentHiddenTitles.length);
+        chrome.runtime.sendMessage({hiddenTitles: currentHiddenTitles});
+      }, 500);
+    } else if (request.action === "filterError") {
+        // Handle error from background.js
+        console.error("Content.js: Error from background script:", request.error);
+        progressText.textContent = `AI 过滤失败: ${request.error}`;
+        if (data.simpleProgressBarEnabled) {
+          progressText.style.display = 'none';
+        } else {
+          progressText.style.display = 'block';
+        }
+        progressBar.style.width = '100%'; // Fill progress bar to indicate completion/error
+        progressBar.style.backgroundColor = 'var(--danger-color)'; // Change color to red
+        // Remove blur for all topics when AI filtering fails
+        allTopicElements.forEach(element => {
+          element.classList.remove('v2ex-filter-blurred');
+          element.style.filter = '';
+        });
+        isErrorDisplayed = true; // Set flag to true
+        setTimeout(() => {
+          progressBarContainer.style.display = 'none';
+        }, 3000); // Keep error message visible for longer
     } else if (request.action === "showAllTopics") {
       allTopicElements.forEach(element => {
-        element.style.display = 'block';
+        element.classList.remove('v2ex-filter-blurred');
+        element.style.filter = '';
       });
     } else if (request.action === "showFilteredTopics") {
-      applyFilter(); // Use the new applyFilter function
+      // With the new logic, "showFilteredTopics" means re-applying blur to useless topics
+      // This requires re-evaluating all topics based on the stored hiddenTitles
+      allTopicElements.forEach(element => {
+        const link = element.querySelector('.item_title > a');
+        const title = link ? link.innerText : '';
+        if (currentHiddenTitles.includes(title)) {
+          element.classList.add('v2ex-filter-blurred');
+          element.style.filter = 'blur(5px)'; // Re-apply blur
+        } else {
+          element.classList.remove('v2ex-filter-blurred');
+          element.style.filter = '';
+        }
+      });
     } else if (request.action === "updateHiddenTitlesAndRefilter") {
       currentHiddenTitles = request.hiddenTitles; // Update the hidden titles
-      applyFilter(); // Re-apply the filter with the new hidden titles
+      // Re-apply the filter (blur/unblur) with the new hidden titles
+      allTopicElements.forEach(element => {
+        const link = element.querySelector('.item_title > a');
+        const title = link ? link.innerText : '';
+        if (currentHiddenTitles.includes(title)) {
+          element.classList.add('v2ex-filter-blurred');
+          element.style.filter = 'blur(5px)'; // Re-apply blur
+        } else {
+          element.classList.remove('v2ex-filter-blurred');
+          element.style.filter = '';
+        }
+      });
       chrome.runtime.sendMessage({hiddenTitles: currentHiddenTitles}); // Update badge in background.js
     }
   });
+});
+
+// Listen for API error messages from background.js
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "apiError") {
+    console.error("Content.js: Received API error from background script:", request.error);
+    // Display the error in the progress bar
+    const progressBarContainer = document.getElementById('v2ex-filter-progress-container');
+    const progressBar = document.getElementById('v2ex-filter-progress-bar');
+    const progressText = document.getElementById('v2ex-filter-progress-text');
+
+    if (progressBarContainer && progressBar && progressText) {
+      progressBarContainer.style.display = 'block';
+      progressBar.style.width = '100%';
+      progressBar.style.backgroundColor = 'var(--danger-color)'; // Red color for error
+      progressText.textContent = `API 错误: ${request.error}`;
+      progressText.style.display = 'block';
+
+      // Hide the error message after a few seconds
+      setTimeout(() => {
+        progressBarContainer.style.display = 'none';
+      }, 5000);
+    }
+  }
 });

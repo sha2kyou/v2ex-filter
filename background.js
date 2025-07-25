@@ -61,7 +61,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       const totalTopics = request.topics.length;
       let processedCount = 0;
 
-      const processTopic = async (title, index) => {
+            const processTopic = async (title, index) => {
         const cacheKey = `${cacheKeyPrefix}${title}`;
         const cachedItem = await chrome.storage.local.get(cacheKey);
 
@@ -85,7 +85,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             setErrorState(error.message); // Set API error on failed AI call
             is_useless_result = false; // Default to not hiding on error
             // Send error to content.js
-            sendResponse({ error: error.message });
+            chrome.tabs.sendMessage(sender.tab.id, { action: "filterError", error: error.message });
             return; // Stop further processing for this request
           }
           // Set new cache item with timestamp
@@ -93,34 +93,35 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
 
         processedCount++;
-        // Send progress update to content.js
+        // Send progress and individual result to content.js
+        console.log(`Background: Sending updateProgress for topic ${index}. is_useless: ${is_useless_result}`);
         chrome.tabs.sendMessage(sender.tab.id, {
           action: "updateProgress",
           processedCount: processedCount,
-          totalCount: totalTopics
+          totalCount: totalTopics,
+          is_useless: is_useless_result,
+          index: index
         });
-
-        return { is_useless: is_useless_result };
       };
 
       const CONCURRENCY_LIMIT = settings.concurrencyLimit || 5; // Limit concurrent AI requests, default to 5
-      const results = [];
       const promises = [];
 
-      for (let i = 0; i < totalTopics; i++) {
+      for (let i = 0; i < request.topics.length; i++) {
         const title = request.topics[i];
         promises.push(processTopic(title, i));
 
-        if (promises.length >= CONCURRENCY_LIMIT || i === totalTopics - 1) {
-          // Wait for the current batch to complete
-          const batchResults = await Promise.all(promises);
-          results.push(...batchResults);
+        if (promises.length >= CONCURRENCY_LIMIT || i === request.topics.length - 1) {
+          await Promise.all(promises);
           promises.length = 0; // Clear the batch
         }
       }
-      sendResponse({ results });
+      // All topics have been processed and results sent individually.
+      // We can send a final completion message if needed.
+      chrome.tabs.sendMessage(sender.tab.id, { action: "filteringComplete" });
     });
   } else if (request.hiddenTitles) {
+    console.log('Background: Received hiddenTitles count:', request.hiddenTitles.length);
     chrome.storage.local.set({hiddenTitles: request.hiddenTitles});
     updateBadge(request.hiddenTitles.length);
   }
@@ -186,7 +187,10 @@ async function isUseless(title, apiKey, selectedModel, apiUrl) {
     }
 
     const data = await response.json();
-    const result = data.choices[0].message.content.trim().toLowerCase();
+    const rawContent = data.choices[0].message.content;
+    const result = rawContent.trim().toLowerCase();
+    console.log(`Background: AI raw content for "${title}":`, rawContent);
+    console.log(`Background: AI processed result for "${title}":`, result === 'true');
     return result === 'true';
   } catch (error) {
     console.error('Error calling Bailian API:', error);
