@@ -149,6 +149,16 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
         background-color: initial !important; /* Reset background color on hover */
         color: initial !important; /* Reset text color on hover */
       }
+      .v2ex-filter-blurred strong a {
+        pointer-events: none !important; /* Ensure strong links are not clickable when blurred */
+      }
+
+      .v2ex-filter-blurred strong a:hover {
+        cursor: default !important;
+        text-decoration: none !important;
+        background-color: initial !important;
+        color: initial !important;
+      }
     `;
     document.head.appendChild(style);
     progressBar.classList.add('animated-gradient'); // Add the class for animated gradient
