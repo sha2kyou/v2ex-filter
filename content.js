@@ -128,6 +128,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
         filter: blur(5px); /* Initial blur */
         pointer-events: none !important; /* Disable clicks */
         transition: filter 0.3s ease-out; /* Smooth transition for unblurring */
+        user-select: none; /* Disable text selection */
       }
       .v2ex-filter-blurred .v2p-topic-actions {
         pointer-events: none !important; /* Ensure actions are not clickable when blurred */
@@ -142,6 +143,8 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
 
       .v2ex-filter-blurred:hover,
       .v2ex-filter-blurred a:hover,
+      .v2ex-filter-blurred td a:hover,
+      .v2ex-filter-blurred strong a:hover,
       .v2ex-filter-blurred span[title]:hover,
       .v2ex-filter-blurred .v2p-topic-preview-btn:hover {
         cursor: default !important;
@@ -153,21 +156,8 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
         pointer-events: none !important; /* Ensure strong links are not clickable when blurred */
       }
 
-      .v2ex-filter-blurred strong a:hover {
-        cursor: default !important;
-        text-decoration: none !important;
-        background-color: initial !important;
-        color: initial !important;
-      }
       .v2ex-filter-blurred td a {
         pointer-events: none !important; /* Ensure td links are not clickable when blurred */
-      }
-
-      .v2ex-filter-blurred td a:hover {
-        cursor: default !important;
-        text-decoration: none !important;
-        background-color: initial !important;
-        color: initial !important;
       }
     `;
     document.head.appendChild(style);
