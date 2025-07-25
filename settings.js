@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function saveSetting(key, value) {
     chrome.storage.sync.set({ [key]: value }, function() {
       if (chrome.runtime.lastError) {
-        console.error(`Error saving ${key}:`, chrome.runtime.lastError);
+        
         showToast(`保存 ${key} 失败。`, 'error');
       } else if (key !== 'selectedModel' && key !== 'selectedApiUrl') {
         showToast(`设置已保存。`);
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Save all settings back to storage.sync to ensure all fields are present
       chrome.storage.sync.set(settingsToSave, function() {
         if (chrome.runtime.lastError) {
-          console.error('Error saving default settings:', chrome.runtime.lastError);
+          
         }
       });
     });
@@ -343,7 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
           chrome.storage.sync.set(importedSettings, function() {
             if (chrome.runtime.lastError) {
               showToast('导入设置失败。', 'error');
-              console.error('Error importing settings:', chrome.runtime.lastError);
+              
             } else {
               showToast('设置已成功导入。');
               loadSettings(); // Reload settings to update UI
@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
           });
         } catch (e) {
           showToast('导入失败：JSON 格式不正确或文件内容无效。', 'error');
-          console.error('JSON parse error or file content invalid:', e);
+          
         }
       };
       reader.readAsText(file);

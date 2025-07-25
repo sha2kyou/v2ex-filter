@@ -205,7 +205,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
 
   // Listen for progress updates from background.js
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log('Content: Received message action:', request.action);
+    
     if (isErrorDisplayed) { // If an error has been displayed, stop processing progress updates
       return;
     }
@@ -221,7 +221,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
           const link = topic.querySelector('.item_title > a');
           if (link) {
             currentHiddenTitles.push(link.innerText);
-            console.log('Content: Added to currentHiddenTitles. Current count:', currentHiddenTitles.length);
+            
           }
         } else {
           topic.classList.remove('v2ex-filter-blurred');
@@ -263,12 +263,12 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
           }
         });
         // Update the badge with the final count of hidden titles (which are now blurred titles)
-        console.log('Content: Sending final hiddenTitles count:', currentHiddenTitles.length);
+        
         chrome.runtime.sendMessage({hiddenTitles: currentHiddenTitles});
       }, 500);
     } else if (request.action === "filterError") {
         // Handle error from background.js
-        console.error("Content.js: Error from background script:", request.error);
+        
         progressText.textContent = `AI 过滤失败: ${request.error}`;
         if (data.simpleProgressBarEnabled) {
           progressText.style.display = 'none';
@@ -327,7 +327,7 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
 // Listen for API error messages from background.js
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "apiError") {
-    console.error("Content.js: Received API error from background script:", request.error);
+    
     // Display the error in the progress bar
     const progressBarContainer = document.getElementById('v2ex-filter-progress-container');
     const progressBar = document.getElementById('v2ex-filter-progress-bar');

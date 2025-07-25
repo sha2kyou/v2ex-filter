@@ -1,22 +1,22 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "clearCache") {
-    console.log("Background: Received clearCache request.");
+    
     chrome.storage.local.get(null, (items) => {
       const keysToRemove = Object.keys(items).filter(key => key.startsWith('v2ex-filter-cache:') || key === 'hiddenTitles');
-      console.log("Background: Keys to remove: ", keysToRemove);
+      
       if (keysToRemove.length > 0) {
         chrome.storage.local.remove(keysToRemove, () => {
           if (chrome.runtime.lastError) {
-            console.error("Background: Error removing cache keys: ", chrome.runtime.lastError);
+            
             sendResponse({success: false, error: chrome.runtime.lastError.message});
           } else {
-            console.log("Background: Cache keys successfully removed.");
+            
             chrome.action.setBadgeText({text: ''}); // Clear badge
             sendResponse({success: true});
           }
         });
       } else {
-        console.log("Background: No cache keys found to remove.");
+        
         chrome.action.setBadgeText({text: ''}); // Clear badge
         sendResponse({success: true});
       }
@@ -25,14 +25,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   if (request.action === "clearBadge") { // 新增：处理 clearBadge 动作
-    console.log("Background: Received clearBadge request.");
+    
     chrome.action.setBadgeText({text: ''}); // 清除徽章
     sendResponse({success: true});
     return true; // Async response
   }
 
   if (request.action === "testApiKey") {
-    console.log("Background: Received testApiKey request.");
+    
     const { apiKey, selectedModel, apiUrl } = request;
     // Use a dummy title to test the API key
     isUseless("这是一个测试标题", apiKey, selectedModel, apiUrl)
@@ -41,7 +41,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         setErrorState(null); // Clear any previous API errors on successful test
       })
       .catch(error => {
-        console.error("Background: API Key test failed:", error);
+        
         sendResponse({ success: false, error: error.message });
         setErrorState(error.message); // Set error state on failed test
       });
@@ -81,7 +81,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             is_useless_result = await isUseless(title, settings.apiKey, settings.selectedModel, currentApiUrl);
             setErrorState(null); // Clear any previous API errors on successful test
           } catch (error) {
-            console.error("Background: Error during AI processing:", error);
+            
             setErrorState(error.message); // Set API error on failed AI call
             is_useless_result = false; // Default to not hiding on error
             // Send error to content.js
@@ -94,7 +94,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         processedCount++;
         // Send progress and individual result to content.js
-        console.log(`Background: Sending updateProgress for topic ${index}. is_useless: ${is_useless_result}`);
+        
         chrome.tabs.sendMessage(sender.tab.id, {
           action: "updateProgress",
           processedCount: processedCount,
@@ -121,7 +121,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       chrome.tabs.sendMessage(sender.tab.id, { action: "filteringComplete" });
     });
   } else if (request.hiddenTitles) {
-    console.log('Background: Received hiddenTitles count:', request.hiddenTitles.length);
+    
     chrome.storage.local.set({hiddenTitles: request.hiddenTitles});
     updateBadge(request.hiddenTitles.length);
   }
@@ -189,11 +189,11 @@ async function isUseless(title, apiKey, selectedModel, apiUrl) {
     const data = await response.json();
     const rawContent = data.choices[0].message.content;
     const result = rawContent.trim().toLowerCase();
-    console.log(`Background: AI raw content for "${title}":`, rawContent);
-    console.log(`Background: AI processed result for "${title}":`, result === 'true');
+    
+    
     return result === 'true';
   } catch (error) {
-    console.error('Error calling Bailian API:', error);
+    
     throw error; // Re-throw the error so the caller can catch it
   }
 }

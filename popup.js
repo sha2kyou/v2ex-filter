@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
           cachedItem.timestamp = Date.now(); // Update timestamp to refresh cache
           chrome.storage.local.set({ [cacheKey]: cachedItem }, function() {
             if (chrome.runtime.lastError) {
-              console.error('Error updating cache for topic:', chrome.runtime.lastError);
+              
             }
           });
         }
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       chrome.storage.local.set({hiddenTitles: updatedHiddenTitles}, function() {
         if (chrome.runtime.lastError) {
-          console.error('Error saving hiddenTitles:', chrome.runtime.lastError);
+          
           showToast('操作失败。', 'error');
         } else {
           showToast('话题已标记为不隐藏。'); // Updated status message
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
         renderHiddenTopics(); // Re-render to show "暂无隐藏话题"
       } else {
         showToast('清除缓存失败。', 'error');
-        console.error('Clear cache failed:', response.error);
+        
       }
       confirmationModal.style.display = 'none'; // Hide the modal
     });
