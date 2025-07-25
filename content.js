@@ -307,11 +307,17 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
         }
         progressBar.style.width = '100%'; // Fill progress bar to indicate completion/error
         progressBar.style.backgroundColor = 'var(--danger-color)'; // Change color to red
-        // Remove blur for all topics when AI filtering fails
-        allTopicElements.forEach(element => {
-          element.classList.remove('v2ex-filter-blurred');
-          element.style.filter = '';
-        });
+        // Remove blur for the specific topic that caused the AI filtering failure
+        if (request.errorTopicTitle) {
+          const errorTopicElement = allTopicElements.find(element => {
+            const link = element.querySelector('.item_title > a');
+            return link && link.textContent === request.errorTopicTitle;
+          });
+          if (errorTopicElement) {
+            errorTopicElement.classList.remove('v2ex-filter-blurred');
+            errorTopicElement.style.filter = '';
+          }
+        }
         isErrorDisplayed = true; // Set flag to true
         setTimeout(() => {
           progressBarContainer.style.display = 'none';

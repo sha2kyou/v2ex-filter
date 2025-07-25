@@ -84,8 +84,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             
             setErrorState(error.message); // Set API error on failed AI call
             is_useless_result = false; // Default to not hiding on error
-            // Send error to content.js
-            chrome.tabs.sendMessage(sender.tab.id, { action: "filterError", error: error.message });
+            // Send error to content.js, including the title of the topic that caused the error
+            chrome.tabs.sendMessage(sender.tab.id, { action: "filterError", error: error.message, errorTopicTitle: title });
             return; // Stop further processing for this request
           }
           // Set new cache item with timestamp
