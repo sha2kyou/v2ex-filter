@@ -135,8 +135,15 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
       .v2ex-filter-blurred a {
         pointer-events: none !important; /* Ensure all links are not clickable when blurred */
       }
+      .v2ex-filter-blurred span[title],
+      .v2ex-filter-blurred .v2p-topic-preview-btn {
+        pointer-events: none !important; /* Ensure these specific elements are not clickable */
+      }
+
       .v2ex-filter-blurred:hover,
-      .v2ex-filter-blurred a:hover {
+      .v2ex-filter-blurred a:hover,
+      .v2ex-filter-blurred span[title]:hover,
+      .v2ex-filter-blurred .v2p-topic-preview-btn:hover {
         cursor: default !important;
         text-decoration: none !important;
         background-color: initial !important; /* Reset background color on hover */
