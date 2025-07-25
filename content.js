@@ -129,6 +129,9 @@ chrome.storage.sync.get(['filterEnabled', 'animatedGradientEnabled', 'simpleProg
         pointer-events: none; /* Disable clicks */
         transition: filter 0.3s ease-out; /* Smooth transition for unblurring */
       }
+      .v2ex-filter-blurred .v2p-topic-actions {
+        pointer-events: none !important; /* Ensure actions are not clickable when blurred */
+      }
     `;
     document.head.appendChild(style);
     progressBar.classList.add('animated-gradient'); // Add the class for animated gradient
