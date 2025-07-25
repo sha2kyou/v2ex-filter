@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Load saved settings
   function loadSettings() {
-    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'animatedGradientEnabled', 'aiIntensity', 'selectedApiUrl', 'customApiUrl', 'concurrencyLimit', 'simpleProgressBarEnabled', 'pokemonReminderEnabled'], function(data) {
+    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'customPrompt', 'selectedModel', 'customModel', 'animatedGradientEnabled', 'aiIntensity', 'selectedApiUrl', 'customApiUrl', 'concurrencyLimit', 'simpleProgressBarEnabled', 'pokemonReminderEnabled'], function(data) {
       const settingsToSave = {};
 
       if (data.apiKey) {
