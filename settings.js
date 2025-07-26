@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     showToast('正在测试 API 密钥...', 'info');
 
-    chrome.runtime.sendMessage({ action: "testApiKey", apiKey: apiKey, selectedModel: selectedModel, apiUrl: apiUrl }, function(response) {
+    chrome.runtime.sendMessage({ action: "testApiKey", apiKey: apiKey, selectedModel: selectedModel, customModel: customModelInput.value, apiUrl: apiUrl, customApiUrl: customApiUrlInput.value }, function(response) {
       if (response && response.success) {
         showToast('API 密钥测试成功！', 'success');
       } else {

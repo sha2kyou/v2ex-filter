@@ -33,7 +33,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   if (request.action === "testApiKey") {
     
-    const { apiKey, selectedModel, apiUrl } = request;
+    const { apiKey, selectedModel: rawSelectedModel, apiUrl: rawApiUrl } = request;
+    let selectedModel = rawSelectedModel;
+    if (rawSelectedModel === 'other') {
+      // Assuming customModel is also passed in the request for testApiKey
+      selectedModel = request.customModel;
+    }
+    let apiUrl = rawApiUrl;
+    if (rawApiUrl === 'other') {
+      // Assuming customApiUrl is also passed in the request for testApiKey
+      apiUrl = request.customApiUrl;
+    } else if (rawApiUrl === 'dashscope') {
+      apiUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
+    }
     // Use a dummy title to test the API key
     isUseless("这是一个测试标题", apiKey, selectedModel, apiUrl)
       .then(result => {
@@ -49,7 +61,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   if (request.topics) {
-    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'selectedModel', 'apiUrl', 'selectedApiUrl', 'customApiUrl', 'concurrencyLimit'], async (settings) => {
+    chrome.storage.sync.get(['apiKey', 'filterEnabled', 'selectedModel', 'customModel', 'apiUrl', 'selectedApiUrl', 'customApiUrl', 'concurrencyLimit'], async (settings) => {
       if (!settings.apiKey || settings.filterEnabled === false) {
         sendResponse({results: request.topics.map(() => ({ is_useless: false }))});
         return;
@@ -78,7 +90,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             } else if (settings.selectedApiUrl === 'other') {
               currentApiUrl = settings.customApiUrl;
             }
-            is_useless_result = await isUseless(title, settings.apiKey, settings.selectedModel, currentApiUrl);
+            let actualSelectedModel = settings.selectedModel;
+            if (actualSelectedModel === 'other') {
+              actualSelectedModel = settings.customModel;
+            }
+            is_useless_result = await isUseless(title, settings.apiKey, actualSelectedModel, currentApiUrl);
             setErrorState(null); // Clear any previous API errors on successful test
           } catch (error) {
             
